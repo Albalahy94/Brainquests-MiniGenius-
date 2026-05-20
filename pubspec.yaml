@@ -1,0 +1,90 @@
+name: minigenius
+description: A fun, safe, and educational mobile app that enhances children's cognitive abilities through mini-games.
+publish_to: 'none'
+version: 2.0.0+3
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI & Design
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  flutter_animate: ^4.5.0
+  
+  # State Management
+  flutter_bloc: ^8.1.3
+  equatable: ^2.0.5
+  provider: ^6.1.1
+  
+  # Local Storage
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_analytics: ^10.7.4
+  firebase_crashlytics: ^3.4.9
+  
+  # Ads
+  google_mobile_ads: ^5.1.0
+  
+  # In-App Purchase
+  in_app_purchase: ^3.1.11
+  
+  # Utilities
+  intl: ^0.20.2
+  flutter_localizations:
+    sdk: flutter
+  uuid: ^4.2.1
+  audioplayers: ^6.1.0
+  
+  # Charts
+  fl_chart: ^0.68.0
+  
+  # PDF Export
+  pdf: ^3.11.1
+  printing: ^5.13.3
+  
+  # Notifications
+  flutter_local_notifications: ^17.2.3
+  permission_handler: ^11.3.1
+  confetti: ^0.8.0
+  flutter_tts: ^4.2.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.7
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
+
+flutter:
+  uses-material-design: true
+  generate: true
+  
+  assets:
+    - assets/images/
+    - assets/sounds/
+    - assets/stickers/
+  
+  # Fonts are loaded via google_fonts package, no need for local font files
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#0F172A"
+  image: "assets/images/app_icon.png"
+  android_12:
+    image: "assets/images/app_icon.png"
+    icon_background_color: "#0F172A"

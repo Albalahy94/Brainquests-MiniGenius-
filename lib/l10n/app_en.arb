@@ -1,0 +1,28 @@
+{
+  "appTitle": "Mini Genius",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "settings": "Settings",
+  "darkMode": "Dark Mode",
+  "language": "Language",
+  "arabic": "Arabic",
+  "english": "English",
+  "privacyPolicy": "Privacy Policy",
+  "play": "Play",
+  "worlds": "Worlds",
+  "dailyChallenge": "Daily Challenge",
+  "parentDashboard": "Parent Dashboard",
+  "shop": "Shop",
+  "achievements": "Achievements",
+  "timeLimitReached": "Time limit reached! Go to Parent Dashboard?",
+  "gameRestricted": "This game is restricted by parents.",
+  "appearance": "Appearance",
+  "legal": "Legal",
+  "about": "About",
+  "deleteAccount": "Delete Account Data",
+  "deleteAccountConfirmTitle": "Delete All Data?",
+  "deleteAccountConfirmMessage": "This will permanently delete all your progress, achievements, and purchased items. This action cannot be undone.",
+  "deleteAccountConfirmButton": "Delete",
+  "cancel": "Cancel"
+}
