@@ -28,7 +28,7 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 # CocoaPods analytics sends minimal, anonymous requirements metadata back to CoreTeam.
-install! 'cocoapods', :manage_sandbox_owner => true
+# install! 'cocoapods', :manage_sandbox_owner => true
 
 target 'Runner' do
   use_frameworks!
