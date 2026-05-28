@@ -63,15 +63,6 @@ jobs:
           flutter pub get
 
       # ─────────────────────────────────────────────
-      # 4. Install CocoaPods
-      # ─────────────────────────────────────────────
-      - name: 🍫 Install CocoaPods dependencies
-        working-directory: ./ios
-        run: |
-          pod repo update
-          pod install --repo-update
-
-      # ─────────────────────────────────────────────
       # 5. Setup Keychain & Install Certificate
       # ─────────────────────────────────────────────
       - name: 🔑 Install Apple Distribution Certificate
