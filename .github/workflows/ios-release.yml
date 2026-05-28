@@ -54,13 +54,15 @@ jobs:
           cache: true
 
       # ─────────────────────────────────────────────
-      # 3. Install Flutter Dependencies
+      # 3. Install Flutter Dependencies & Generate Code
       # ─────────────────────────────────────────────
-      - name: 📦 Install Flutter dependencies
+      - name: 📦 Install Flutter dependencies & Generate Code
         run: |
           # flutter clean is vital to clear outdated cached builds
           flutter clean
           flutter pub get
+          # Generate Hive and other build_runner code
+          dart run build_runner build --delete-conflicting-outputs
 
       # ─────────────────────────────────────────────
       # 5. Setup Keychain & Install Certificate
