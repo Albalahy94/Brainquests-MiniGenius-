@@ -189,6 +189,7 @@ jobs:
                   new_lines.append(f"{indent}CODE_SIGN_STYLE = Manual;")
                   new_lines.append(f"{indent}ProvisioningStyle = Manual;")
                   new_lines.append(f"{indent}PROVISIONING_PROFILE_SPECIFIER = \"{profile_name}\";")
+                  new_lines.append(f"{indent}CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;")
               elif "CODE_SIGN_STYLE =" in line or "ProvisioningStyle =" in line:
                   new_lines.append(line.replace("Automatic", "Manual"))
               elif "\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" =" in line:

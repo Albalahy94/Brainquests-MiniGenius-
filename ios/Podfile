@@ -31,7 +31,7 @@ flutter_ios_podfile_setup
 # install! 'cocoapods', :manage_sandbox_owner => true
 
 target 'Runner' do
-  use_frameworks!
+  use_frameworks! :linkage => :static
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
