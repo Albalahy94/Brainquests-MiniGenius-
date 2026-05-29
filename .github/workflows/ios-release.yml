@@ -115,8 +115,12 @@ jobs:
           BUNDLE_ID_FROM_PROFILE=$(echo $APP_ID | sed 's/^[^\.]*\.//')
           echo "BUNDLE_ID_FROM_PROFILE=$BUNDLE_ID_FROM_PROFILE" >> $GITHUB_ENV
 
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          # Extract Team ID from profile
+          PROFILE_TEAM_ID=$(security cms -D -i $PROFILE_PATH | plutil -extract TeamIdentifier.0 raw -)
+          echo "PROFILE_TEAM_ID=$PROFILE_TEAM_ID" >> $GITHUB_ENV
+
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp $PROFILE_PATH "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
 
       # ─────────────────────────────────────────────
       # 7. Setup ExportOptions.plist
@@ -131,10 +135,10 @@ jobs:
             <key>method</key>
             <string>app-store-connect</string>
             <key>teamID</key>
-            <string>${{ secrets.APPLE_TEAM_ID }}</string>
+            <string>${{ env.PROFILE_TEAM_ID }}</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>${{ secrets.BUNDLE_IDENTIFIER }}</key>
+              <key>${{ env.BUNDLE_ID_FROM_PROFILE }}</key>
               <string>${{ env.PROVISIONING_PROFILE_NAME }}</string>
             </dict>
             <key>signingStyle</key>
@@ -174,11 +178,12 @@ jobs:
           with open(pbx_path, "r") as f:
               content = f.read()
 
-          team_id = os.environ.get("APPLE_TEAM_ID")
+          team_id = os.environ.get("PROFILE_TEAM_ID") or os.environ.get("APPLE_TEAM_ID")
           bundle_id = os.environ.get("BUNDLE_ID_FROM_PROFILE")
           profile_name = os.environ.get("PROVISIONING_PROFILE_NAME")
+          profile_uuid = os.environ.get("PROVISIONING_PROFILE_UUID")
 
-          print(f"Injecting Team ID: {team_id}, Bundle ID: {bundle_id}, Profile: {profile_name}")
+          print(f"Injecting Team ID: {team_id}, Bundle ID: {bundle_id}, Profile Name: {profile_name}, Profile UUID: {profile_uuid}")
 
           new_lines = []
           for line in content.splitlines():
@@ -188,6 +193,7 @@ jobs:
                   new_lines.append(f"{indent}DEVELOPMENT_TEAM = {team_id};")
                   new_lines.append(f"{indent}CODE_SIGN_STYLE = Manual;")
                   new_lines.append(f"{indent}ProvisioningStyle = Manual;")
+                  new_lines.append(f"{indent}PROVISIONING_PROFILE = \"{profile_uuid}\";")
                   new_lines.append(f"{indent}PROVISIONING_PROFILE_SPECIFIER = \"{profile_name}\";")
                   new_lines.append(f"{indent}CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;")
               elif "CODE_SIGN_STYLE =" in line or "ProvisioningStyle =" in line:
