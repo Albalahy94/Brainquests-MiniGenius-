@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../models/user_progress.dart';
@@ -14,7 +15,14 @@ class AdsService {
   final StorageService _storageService = StorageService();
 
   // AdMob Ad Unit IDs
-  static const String _bannerAdUnitId = 'ca-app-pub-2410231577080071/1286377452'; // minigenius_banner
+  static String get _bannerAdUnitId {
+    if (Platform.isAndroid) {
+      return 'ca-app-pub-2410231577080071/1286377452'; // Android banner
+    } else if (Platform.isIOS) {
+      return 'ca-app-pub-2410231577080071/6360678183'; // iOS banner
+    }
+    return '';
+  }
 
   Future<void> initialize() async {
     if (_isInitialized) return;

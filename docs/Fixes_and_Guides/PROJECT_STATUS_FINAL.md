@@ -48,8 +48,10 @@
 
 ### 🔗 التكاملات ✅
 - [x] **AdMob** - محدث ✅
-  - App ID: `ca-app-pub-2410231577080071~1286377452`
-  - Banner ID: `ca-app-pub-2410231577080071/1286377452`
+  - Android App ID: `ca-app-pub-2410231577080071~1286377452`
+  - Android Banner ID: `ca-app-pub-2410231577080071/1286377452`
+  - iOS App ID: `ca-app-pub-2410231577080071~2357323766`
+  - iOS Banner ID: `ca-app-pub-2410231577080071/6360678183`
 - [x] **Firebase** - محدث ✅
   - Package: `com.minigenius.app`
   - Analytics & Crashlytics
