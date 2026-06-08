@@ -24,5 +24,165 @@
   "deleteAccountConfirmTitle": "Delete All Data?",
   "deleteAccountConfirmMessage": "This will permanently delete all your progress, achievements, and purchased items. This action cannot be undone.",
   "deleteAccountConfirmButton": "Delete",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "streakDays": "{count} days streak",
+  "@streakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "challengeGoal": "Goal: {score} points",
+  "@challengeGoal": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "challengeCompleted": "Challenge Completed!",
+  "rewards": "Rewards",
+  "rewardStars": "{stars} Stars",
+  "@rewardStars": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardCoins": "{coins} Coins",
+  "@rewardCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "startGame": "Start Game",
+  "enterPassword": "Please enter the password",
+  "incorrectPassword": "Incorrect password",
+  "setPassword": "Set Password",
+  "changePassword": "Change Password",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "enterStrongPassword": "Enter a strong password",
+  "reenterPassword": "Re-enter password",
+  "save": "Save",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "passwordTooShort": "Password must be at least 4 characters",
+  "passwordSetSuccess": "Password set successfully",
+  "oldPassword": "Old Password",
+  "newPassword": "New Password",
+  "confirmNewPassword": "Confirm New Password",
+  "fillAllFields": "Please fill in all fields",
+  "newPasswordsDoNotMatch": "New passwords do not match",
+  "passwordChangeSuccess": "Password changed successfully",
+  "playTimeToday": "Play Time Today",
+  "minutes": "minutes",
+  "minutesUnit": "min",
+  "maxPlayTimeLimit": "Limit: {limit} minutes",
+  "@maxPlayTimeLimit": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "noLimit": "No Limit",
+  "notSet": "Not Set",
+  "games": "Games",
+  "levels": "Levels",
+  "stars": "Stars",
+  "playTime": "Play Time",
+  "charts": "Charts",
+  "exportPdf": "Export PDF",
+  "playCountPerGame": "Play Count Per Game",
+  "gameDistribution": "Game Distribution",
+  "noStatsYet": "No statistics yet",
+  "gameStatistics": "Game Statistics",
+  "timesUnit": "times",
+  "averageScore": "Average: {score}",
+  "@averageScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "enableParentMode": "Enable Parent Mode",
+  "dailyPlayTimeLimit": "Daily Play Time Limit",
+  "allowedGames": "Allowed Games",
+  "allGamesAllowed": "All Games",
+  "ageGroup": "Age Group",
+  "yearsUnit": "years",
+  "achievementAlerts": "Achievement Alerts",
+  "notifyNewAchievement": "Notify when a new achievement is unlocked",
+  "passwordIsSet": "Password is set",
+  "passwordNotSet": "Password is not set",
+  "passwordNotSetYet": "Password is not set yet",
+  "enter": "Enter",
+  "allGamesEnabledSuccess": "All games enabled",
+  "allowedGamesUpdatedSuccess": "Allowed games updated",
+  "childAgeGroupTitle": "Child's Age Group",
+  "yearsRange": "{min}-{max} years",
+  "@yearsRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ageRangeAbove": "{age}+ years",
+  "@ageRangeAbove": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "gameNameMemoryCards": "Memory Cards",
+  "gameNameFindDifference": "Find the Difference",
+  "gameNameShapeMatcher": "Shape Matcher",
+  "gameNamePatternLogic": "Pattern Logic",
+  "gameNameQuickMath": "Quick Math",
+  "gameNameColorMemory": "Color Memory",
+  "gameNameWordPuzzle": "Word Puzzle",
+  "gameNameMazeRunner": "Maze Runner",
+  "gameNameSortingGame": "Sorting Game",
+  "gameNameJigsawPuzzle": "Jigsaw Puzzle",
+  "childProgressReportTitle": "Child Progress Report - MiniGenius",
+  "reportDate": "Report Date",
+  "pdfTableGame": "Game",
+  "pdfTableTimes": "Times Played",
+  "pdfTableAvgScore": "Average Score",
+  "star": "Star",
+  "worldLockedMessage": "This world is locked. You need {stars} stars to unlock it.",
+  "@worldLockedMessage": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "levelsCount": "{count} Levels",
+  "@levelsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseGameForLevel": "Choose Game - Level {level}",
+  "@chooseGameForLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "worldLockedPrompt": "This world is locked. Please unlock it first."
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minigenius/generated/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/world_service.dart';
 import '../../../core/services/storage_service.dart';
@@ -74,6 +75,7 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
     }
 
     final availableWorlds = _worldService.getAvailableWorlds(_totalStars);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Container(
@@ -94,7 +96,7 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'العوالم',
+                        l10n.worlds,
                         textAlign: TextAlign.center,
                         style:
                             Theme.of(context).textTheme.headlineLarge?.copyWith(
@@ -131,9 +133,9 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      'نجمة',
-                      style: TextStyle(
+                    Text(
+                      l10n.star,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                       ),
@@ -182,7 +184,7 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    'هذا العالم مقفل. تحتاج ${world.requiredStars} نجمة لفتحه.',
+                                    l10n.worldLockedMessage(world.requiredStars),
                                   ),
                                   duration: const Duration(seconds: 2),
                                 ),
@@ -225,6 +227,11 @@ class _WorldCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final worldName = isAr ? world.nameAr : world.name;
+    final worldDescription = isAr ? world.descriptionAr : world.description;
+    final l10n = AppLocalizations.of(context)!;
+
     return GestureDetector(
       onTap: isUnlocked ? onTap : null,
       child: Container(
@@ -241,113 +248,103 @@ class _WorldCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Stack(
-          children: [
-            // Lock overlay
-            if (!isUnlocked)
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(20),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  world.icon,
+                  style: const TextStyle(fontSize: 40),
                 ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.lock,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${world.requiredStars} ⭐',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 6),
+                Text(
+                  worldName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-
-            // Content
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      world.icon,
-                      style: const TextStyle(fontSize: 40),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      world.nameAr,
+                const SizedBox(height: 6),
+                if (isUnlocked) ...[
+                  Flexible(
+                    child: Text(
+                      worldDescription,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 11,
+                        height: 1.1,
                       ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 3),
-                    Flexible(
-                      child: Text(
-                        world.descriptionAr,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 11,
-                          height: 1.1,
+                  ),
+                  const SizedBox(height: 6),
+                  if (worldProgress.completedLevels > 0)
+                    Column(
+                      children: [
+                        Text(
+                          l10n.levelsCount(world.totalLevels) +
+                              ' (${worldProgress.completedLevels}/${world.totalLevels})',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        const SizedBox(height: 2),
+                        Text(
+                          '${worldProgress.totalStars} ⭐',
+                          style: TextStyle(
+                            color: Colors.amber.withOpacity(0.9),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      l10n.levelsCount(world.totalLevels),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 12,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    // Show progress if unlocked
-                    if (isUnlocked && worldProgress.completedLevels > 0)
-                      Column(
-                        children: [
-                          Text(
-                            '${worldProgress.completedLevels}/${world.totalLevels} مستويات',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${worldProgress.totalStars} ⭐',
-                            style: TextStyle(
-                              color: Colors.amber.withOpacity(0.9),
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      )
-                    else
-                      Text(
-                        '${world.totalLevels} مستويات',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 12,
-                        ),
+                ] else ...[
+                  // Locked Layout: lock icon and star requirements cleanly presented without overlapping text
+                  const Icon(
+                    Icons.lock,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${world.requiredStars} ⭐',
+                      style: const TextStyle(
+                        color: Colors.amber,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
-                  ],
-                ),
-              ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

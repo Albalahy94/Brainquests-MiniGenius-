@@ -235,6 +235,486 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
+
+  /// No description provided for @streakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days streak'**
+  String streakDays(int count);
+
+  /// No description provided for @challengeGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal: {score} points'**
+  String challengeGoal(int score);
+
+  /// No description provided for @challengeCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge Completed!'**
+  String get challengeCompleted;
+
+  /// No description provided for @rewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get rewards;
+
+  /// No description provided for @rewardStars.
+  ///
+  /// In en, this message translates to:
+  /// **'{stars} Stars'**
+  String rewardStars(int stars);
+
+  /// No description provided for @rewardCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'{coins} Coins'**
+  String rewardCoins(int coins);
+
+  /// No description provided for @startGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Game'**
+  String get startGame;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the password'**
+  String get enterPassword;
+
+  /// No description provided for @incorrectPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password'**
+  String get incorrectPassword;
+
+  /// No description provided for @setPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Password'**
+  String get setPassword;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// No description provided for @enterStrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a strong password'**
+  String get enterStrongPassword;
+
+  /// No description provided for @reenterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter password'**
+  String get reenterPassword;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 4 characters'**
+  String get passwordTooShort;
+
+  /// No description provided for @passwordSetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password set successfully'**
+  String get passwordSetSuccess;
+
+  /// No description provided for @oldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Old Password'**
+  String get oldPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// No description provided for @confirmNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get confirmNewPassword;
+
+  /// No description provided for @fillAllFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in all fields'**
+  String get fillAllFields;
+
+  /// No description provided for @newPasswordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'New passwords do not match'**
+  String get newPasswordsDoNotMatch;
+
+  /// No description provided for @passwordChangeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully'**
+  String get passwordChangeSuccess;
+
+  /// No description provided for @playTimeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Time Today'**
+  String get playTimeToday;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes;
+
+  /// No description provided for @minutesUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get minutesUnit;
+
+  /// No description provided for @maxPlayTimeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit: {limit} minutes'**
+  String maxPlayTimeLimit(int limit);
+
+  /// No description provided for @noLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'No Limit'**
+  String get noLimit;
+
+  /// No description provided for @notSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Set'**
+  String get notSet;
+
+  /// No description provided for @games.
+  ///
+  /// In en, this message translates to:
+  /// **'Games'**
+  String get games;
+
+  /// No description provided for @levels.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels'**
+  String get levels;
+
+  /// No description provided for @stars.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars'**
+  String get stars;
+
+  /// No description provided for @playTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Time'**
+  String get playTime;
+
+  /// No description provided for @charts.
+  ///
+  /// In en, this message translates to:
+  /// **'Charts'**
+  String get charts;
+
+  /// No description provided for @exportPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get exportPdf;
+
+  /// No description provided for @playCountPerGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Count Per Game'**
+  String get playCountPerGame;
+
+  /// No description provided for @gameDistribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Distribution'**
+  String get gameDistribution;
+
+  /// No description provided for @noStatsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No statistics yet'**
+  String get noStatsYet;
+
+  /// No description provided for @gameStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Statistics'**
+  String get gameStatistics;
+
+  /// No description provided for @timesUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'times'**
+  String get timesUnit;
+
+  /// No description provided for @averageScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Average: {score}'**
+  String averageScore(String score);
+
+  /// No description provided for @enableParentMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Parent Mode'**
+  String get enableParentMode;
+
+  /// No description provided for @dailyPlayTimeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Play Time Limit'**
+  String get dailyPlayTimeLimit;
+
+  /// No description provided for @allowedGames.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed Games'**
+  String get allowedGames;
+
+  /// No description provided for @allGamesAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'All Games'**
+  String get allGamesAllowed;
+
+  /// No description provided for @ageGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Age Group'**
+  String get ageGroup;
+
+  /// No description provided for @yearsUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'years'**
+  String get yearsUnit;
+
+  /// No description provided for @achievementAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement Alerts'**
+  String get achievementAlerts;
+
+  /// No description provided for @notifyNewAchievement.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify when a new achievement is unlocked'**
+  String get notifyNewAchievement;
+
+  /// No description provided for @passwordIsSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is set'**
+  String get passwordIsSet;
+
+  /// No description provided for @passwordNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is not set'**
+  String get passwordNotSet;
+
+  /// No description provided for @passwordNotSetYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is not set yet'**
+  String get passwordNotSetYet;
+
+  /// No description provided for @enter.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter'**
+  String get enter;
+
+  /// No description provided for @allGamesEnabledSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All games enabled'**
+  String get allGamesEnabledSuccess;
+
+  /// No description provided for @allowedGamesUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed games updated'**
+  String get allowedGamesUpdatedSuccess;
+
+  /// No description provided for @childAgeGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Child\'s Age Group'**
+  String get childAgeGroupTitle;
+
+  /// No description provided for @yearsRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{min}-{max} years'**
+  String yearsRange(int min, int max);
+
+  /// No description provided for @ageRangeAbove.
+  ///
+  /// In en, this message translates to:
+  /// **'{age}+ years'**
+  String ageRangeAbove(int age);
+
+  /// No description provided for @gameNameMemoryCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Cards'**
+  String get gameNameMemoryCards;
+
+  /// No description provided for @gameNameFindDifference.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the Difference'**
+  String get gameNameFindDifference;
+
+  /// No description provided for @gameNameShapeMatcher.
+  ///
+  /// In en, this message translates to:
+  /// **'Shape Matcher'**
+  String get gameNameShapeMatcher;
+
+  /// No description provided for @gameNamePatternLogic.
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern Logic'**
+  String get gameNamePatternLogic;
+
+  /// No description provided for @gameNameQuickMath.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Math'**
+  String get gameNameQuickMath;
+
+  /// No description provided for @gameNameColorMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Color Memory'**
+  String get gameNameColorMemory;
+
+  /// No description provided for @gameNameWordPuzzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Word Puzzle'**
+  String get gameNameWordPuzzle;
+
+  /// No description provided for @gameNameMazeRunner.
+  ///
+  /// In en, this message translates to:
+  /// **'Maze Runner'**
+  String get gameNameMazeRunner;
+
+  /// No description provided for @gameNameSortingGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorting Game'**
+  String get gameNameSortingGame;
+
+  /// No description provided for @gameNameJigsawPuzzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Jigsaw Puzzle'**
+  String get gameNameJigsawPuzzle;
+
+  /// No description provided for @childProgressReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Child Progress Report - MiniGenius'**
+  String get childProgressReportTitle;
+
+  /// No description provided for @reportDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Date'**
+  String get reportDate;
+
+  /// No description provided for @pdfTableGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Game'**
+  String get pdfTableGame;
+
+  /// No description provided for @pdfTableTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Times Played'**
+  String get pdfTableTimes;
+
+  /// No description provided for @pdfTableAvgScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Score'**
+  String get pdfTableAvgScore;
+
+  /// No description provided for @star.
+  ///
+  /// In en, this message translates to:
+  /// **'Star'**
+  String get star;
+
+  /// No description provided for @worldLockedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This world is locked. You need {stars} stars to unlock it.'**
+  String worldLockedMessage(int stars);
+
+  /// No description provided for @levelsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Levels'**
+  String levelsCount(int count);
+
+  /// No description provided for @chooseGameForLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Game - Level {level}'**
+  String chooseGameForLevel(int level);
+
+  /// No description provided for @worldLockedPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'This world is locked. Please unlock it first.'**
+  String get worldLockedPrompt;
 }
 
 class _AppLocalizationsDelegate

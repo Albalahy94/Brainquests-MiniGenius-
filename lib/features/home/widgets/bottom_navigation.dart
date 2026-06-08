@@ -84,12 +84,16 @@ class CustomBottomNavigation extends StatelessWidget {
                 size: 24,
               ),
               const SizedBox(height: 4),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: isSelected ? AppTheme.primaryBlue : AppTheme.grey,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: isSelected ? AppTheme.primaryBlue : AppTheme.grey,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                ),
               ),
             ],
           ),

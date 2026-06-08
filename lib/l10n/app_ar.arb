@@ -21,5 +21,165 @@
   "deleteAccountConfirmTitle": "حذف جميع البيانات؟",
   "deleteAccountConfirmMessage": "سيؤدي هذا إلى حذف جميع بيانات التقدم والإنجازات والمشتريات بشكل دائم. لا يمكن التراجع عن هذا الإجراء.",
   "deleteAccountConfirmButton": "حذف",
-  "cancel": "إلغاء"
+  "cancel": "إلغاء",
+  "streakDays": "{count} يوم متتالي",
+  "@streakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "challengeGoal": "الهدف: {score} نقطة",
+  "@challengeGoal": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "challengeCompleted": "تم إكمال التحدي!",
+  "rewards": "المكافآت",
+  "rewardStars": "{stars} نجوم",
+  "@rewardStars": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardCoins": "{coins} عملة",
+  "@rewardCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "startGame": "ابدأ اللعب",
+  "enterPassword": "يرجى إدخال كلمة المرور",
+  "incorrectPassword": "كلمة المرور غير صحيحة",
+  "setPassword": "إعداد كلمة المرور",
+  "changePassword": "تغيير كلمة المرور",
+  "password": "كلمة المرور",
+  "confirmPassword": "تأكيد كلمة المرور",
+  "enterStrongPassword": "أدخل كلمة مرور قوية",
+  "reenterPassword": "أعد إدخال كلمة المرور",
+  "save": "حفظ",
+  "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+  "passwordTooShort": "كلمة المرور يجب أن تكون 4 أحرف على الأقل",
+  "passwordSetSuccess": "تم إعداد كلمة المرور بنجاح",
+  "oldPassword": "كلمة المرور القديمة",
+  "newPassword": "كلمة المرور الجديدة",
+  "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+  "fillAllFields": "يرجى ملء جميع الحقول",
+  "newPasswordsDoNotMatch": "كلمات المرور الجديدة غير متطابقة",
+  "passwordChangeSuccess": "تم تغيير كلمة المرور بنجاح",
+  "playTimeToday": "وقت اللعب اليوم",
+  "minutes": "دقيقة",
+  "minutesUnit": "دقيقة",
+  "maxPlayTimeLimit": "الحد الأقصى: {limit} دقيقة",
+  "@maxPlayTimeLimit": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "noLimit": "لا يوجد حد",
+  "notSet": "غير محدد",
+  "games": "الألعاب",
+  "levels": "المستويات",
+  "stars": "النجوم",
+  "playTime": "وقت اللعب",
+  "charts": "الرسوم البيانية",
+  "exportPdf": "تصدير PDF",
+  "playCountPerGame": "عدد مرات اللعب لكل لعبة",
+  "gameDistribution": "توزيع الألعاب",
+  "noStatsYet": "لا توجد إحصائيات بعد",
+  "gameStatistics": "إحصائيات الألعاب",
+  "timesUnit": "مرات",
+  "averageScore": "متوسط: {score}",
+  "@averageScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "enableParentMode": "تفعيل وضع الوالدين",
+  "dailyPlayTimeLimit": "حد وقت اللعب اليومي",
+  "allowedGames": "الألعاب المسموحة",
+  "allGamesAllowed": "جميع الألعاب",
+  "ageGroup": "الفئة العمرية",
+  "yearsUnit": "سنوات",
+  "achievementAlerts": "تنبيهات الإنجازات",
+  "notifyNewAchievement": "إشعار عند فتح إنجاز جديد",
+  "passwordIsSet": "تم إعداد كلمة المرور",
+  "passwordNotSet": "لم يتم إعداد كلمة المرور",
+  "passwordNotSetYet": "لم يتم إعداد كلمة المرور بعد",
+  "enter": "دخول",
+  "allGamesEnabledSuccess": "تم تفعيل جميع الألعاب",
+  "allowedGamesUpdatedSuccess": "تم تحديث الألعاب المسموحة",
+  "childAgeGroupTitle": "الفئة العمرية للطفل",
+  "yearsRange": "{min}-{max} سنوات",
+  "@yearsRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ageRangeAbove": "{age}+ سنة",
+  "@ageRangeAbove": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "gameNameMemoryCards": "بطاقات الذاكرة",
+  "gameNameFindDifference": "إيجاد الفروقات",
+  "gameNameShapeMatcher": "مطابقة الأشكال",
+  "gameNamePatternLogic": "منطق الأنماط",
+  "gameNameQuickMath": "الرياضيات السريعة",
+  "gameNameColorMemory": "ذاكرة الألوان",
+  "gameNameWordPuzzle": "ألغاز الكلمات",
+  "gameNameMazeRunner": "متاهة",
+  "gameNameSortingGame": "لعبة الترتيب",
+  "gameNameJigsawPuzzle": "بازل",
+  "childProgressReportTitle": "تقرير تقدم الطفل - MiniGenius",
+  "reportDate": "تاريخ التقرير",
+  "pdfTableGame": "اللعبة",
+  "pdfTableTimes": "عدد المرات",
+  "pdfTableAvgScore": "متوسط النقاط",
+  "star": "نجمة",
+  "worldLockedMessage": "هذا العالم مقفل. تحتاج {stars} نجمة لفتحه.",
+  "@worldLockedMessage": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "levelsCount": "{count} مستويات",
+  "@levelsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseGameForLevel": "اختر اللعبة - المستوى {level}",
+  "@chooseGameForLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "worldLockedPrompt": "هذا العالم مقفل. يرجى فتحه أولاً."
 }

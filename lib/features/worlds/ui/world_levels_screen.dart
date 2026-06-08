@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minigenius/generated/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/world_service.dart';
 import '../../../core/services/storage_service.dart';
@@ -43,11 +44,12 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
       // If world is not unlocked, go back
       if (!isUnlocked) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('هذا العالم مقفل. يرجى فتحه أولاً.'),
+            SnackBar(
+              content: Text(l10n.worldLockedPrompt),
               backgroundColor: Colors.orange,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
           Navigator.pop(context);
@@ -73,9 +75,10 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
         setState(() {
           _isLoading = false;
         });
+        final isAr = Localizations.localeOf(context).languageCode == 'ar';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في تحميل المستويات: $e'),
+            content: Text(isAr ? 'خطأ في تحميل المستويات: $e' : 'Error loading levels: $e'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -83,6 +86,23 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
         // Go back if there's an error
         Navigator.pop(context);
       }
+    }
+  }
+
+  String _getGameName(BuildContext context, String gameId) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (gameId) {
+      case 'memory_cards': return l10n.gameNameMemoryCards;
+      case 'find_difference': return l10n.gameNameFindDifference;
+      case 'shape_matcher': return l10n.gameNameShapeMatcher;
+      case 'pattern_logic': return l10n.gameNamePatternLogic;
+      case 'quick_math': return l10n.gameNameQuickMath;
+      case 'color_memory': return l10n.gameNameColorMemory;
+      case 'word_puzzle': return l10n.gameNameWordPuzzle;
+      case 'maze_runner': return l10n.gameNameMazeRunner;
+      case 'sorting_game': return l10n.gameNameSortingGame;
+      case 'jigsaw_puzzle': return l10n.gameNameJigsawPuzzle;
+      default: return gameId;
     }
   }
 
@@ -100,6 +120,11 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
         ),
       );
     }
+
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final worldName = isAr ? _world!.nameAr : _world!.name;
+    final worldDescription = isAr ? _world!.descriptionAr : _world!.description;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Container(
@@ -135,7 +160,7 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
                             style: const TextStyle(fontSize: 32),
                           ),
                           Text(
-                            _world!.nameAr,
+                            worldName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 24,
@@ -143,7 +168,7 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
                             ),
                           ),
                           Text(
-                            _world!.descriptionAr,
+                            worldDescription,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
                               fontSize: 14,
@@ -226,11 +251,12 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
   }
 
   void _navigateToLevel(int levelNumber) {
+    final l10n = AppLocalizations.of(context)!;
     // Show dialog to select game for this level
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('اختر اللعبة - المستوى $levelNumber'),
+        title: Text(l10n.chooseGameForLevel(levelNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: _world!.gameIds.map((gameId) {
@@ -240,7 +266,7 @@ class _WorldLevelsScreenState extends State<WorldLevelsScreen> {
             );
             return ListTile(
               leading: Icon(game.icon, color: game.color),
-              title: Text(game.name),
+              title: Text(_getGameName(context, game.id)),
               onTap: () {
                 Navigator.pop(context);
                 // Navigate to game with level parameter
@@ -293,63 +319,48 @@ class _LevelCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Stack(
-          children: [
-            // Lock overlay
-            if (!isUnlocked)
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Center(
+        child: Center(
+          child: isUnlocked
+              ? Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$levelNumber',
+                        style: TextStyle(
+                          color: isCompleted ? Colors.white : worldColor,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (isCompleted && stars > 0) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            3,
+                            (index) => Icon(
+                              Icons.star,
+                              size: 12,
+                              color: index < stars
+                                  ? AppTheme.yellowAccent
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                )
+              : const Center(
                   child: Icon(
                     Icons.lock,
                     color: Colors.white,
                     size: 30,
                   ),
                 ),
-              ),
-
-            // Content
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '$levelNumber',
-                      style: TextStyle(
-                        color: isUnlocked
-                            ? (isCompleted ? Colors.white : worldColor)
-                            : Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (isCompleted && stars > 0) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          3,
-                          (index) => Icon(
-                            Icons.star,
-                            size: 12,
-                            color: index < stars
-                                ? AppTheme.yellowAccent
-                                : Colors.grey,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );
