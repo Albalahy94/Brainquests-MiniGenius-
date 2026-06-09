@@ -70,11 +70,14 @@ class FirebaseService {
   }
 
   Future<void> setAnalyticsUserId(String userId) async {
+    // Disabled for COPPA compliance (Kids Category)
+    /*
     try {
       await _analytics?.setUserId(id: userId);
     } catch (e) {
       // Handle error silently
     }
+    */
   }
 
   Future<void> setUserProperty(String name, String value) async {
@@ -109,12 +112,14 @@ class FirebaseService {
   }
 
   void setCrashlyticsUserId(String userId) {
-    _crashlytics?.setUserIdentifier(userId);
+    // Disabled for COPPA compliance (Kids Category)
+    // _crashlytics?.setUserIdentifier(userId);
   }
 
   // Convenience method to set user ID for both services
   Future<void> setUserId(String userId) async {
-    await setAnalyticsUserId(userId);
-    setCrashlyticsUserId(userId);
+    // Disabled for COPPA compliance (Kids Category)
+    // await setAnalyticsUserId(userId);
+    // setCrashlyticsUserId(userId);
   }
 }
