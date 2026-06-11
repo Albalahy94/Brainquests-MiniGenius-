@@ -181,5 +181,10 @@
       }
     }
   },
-  "worldLockedPrompt": "هذا العالم مقفل. يرجى فتحه أولاً."
+  "worldLockedPrompt": "هذا العالم مقفل. يرجى فتحه أولاً.",
+  "contactDeveloper": "تواصل مع المطوّر",
+  "parentalGateTitle": "التحقق من هوية الوالد",
+  "parentalGateDescription": "هذا القسم مخصص للوالدين فقط. يرجى الإجابة على السؤال للمتابعة.",
+  "parentalGateWrongAnswer": "إجابة خاطئة. يرجى المحاولة مجدداً.",
+  "parentalGateContinue": "متابعة"
 }

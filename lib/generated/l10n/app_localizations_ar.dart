@@ -340,4 +340,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get worldLockedPrompt => 'هذا العالم مقفل. يرجى فتحه أولاً.';
+
+  @override
+  String get contactDeveloper => 'تواصل مع المطوّر';
+
+  @override
+  String get parentalGateTitle => 'التحقق من هوية الوالد';
+
+  @override
+  String get parentalGateDescription =>
+      'هذا القسم مخصص للوالدين فقط. يرجى الإجابة على السؤال للمتابعة.';
+
+  @override
+  String get parentalGateWrongAnswer => 'إجابة خاطئة. يرجى المحاولة مجدداً.';
+
+  @override
+  String get parentalGateContinue => 'متابعة';
 }

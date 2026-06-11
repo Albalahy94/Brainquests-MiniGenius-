@@ -184,5 +184,10 @@
       }
     }
   },
-  "worldLockedPrompt": "This world is locked. Please unlock it first."
+  "worldLockedPrompt": "This world is locked. Please unlock it first.",
+  "contactDeveloper": "Contact Developer",
+  "parentalGateTitle": "Parent Verification",
+  "parentalGateDescription": "This section is for parents only. Please answer the question to continue.",
+  "parentalGateWrongAnswer": "Incorrect answer. Please try again.",
+  "parentalGateContinue": "Continue"
 }

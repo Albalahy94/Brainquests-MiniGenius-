@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:minigenius/core/widgets/parental_gate_dialog.dart';
 import 'package:minigenius/generated/l10n/app_localizations.dart';
 import 'package:minigenius/core/theme/app_theme.dart';
 import 'package:minigenius/core/providers/app_state_provider.dart';
@@ -84,6 +86,30 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           
+          // Contact Developer
+          ListTile(
+            leading: Icon(Icons.email_outlined, color: theme.colorScheme.primary),
+            title: Text(l10n.contactDeveloper),
+            trailing: const Icon(Icons.open_in_new, size: 16),
+            onTap: () async {
+              final isParent = await showParentalGateDialog(context);
+              if (isParent && context.mounted) {
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: 'mohamed@albalahy4u.com',
+                  query: 'subject=Mini Genius App Support',
+                );
+                try {
+                  if (!await launchUrl(emailLaunchUri)) {
+                    // Ignore
+                  }
+                } catch (e) {
+                  // Ignore
+                }
+              }
+            },
+          ),
+
           const SizedBox(height: 40),
         ],
       ),

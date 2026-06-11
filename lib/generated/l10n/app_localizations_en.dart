@@ -341,4 +341,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get worldLockedPrompt =>
       'This world is locked. Please unlock it first.';
+
+  @override
+  String get contactDeveloper => 'Contact Developer';
+
+  @override
+  String get parentalGateTitle => 'Parent Verification';
+
+  @override
+  String get parentalGateDescription =>
+      'This section is for parents only. Please answer the question to continue.';
+
+  @override
+  String get parentalGateWrongAnswer => 'Incorrect answer. Please try again.';
+
+  @override
+  String get parentalGateContinue => 'Continue';
 }

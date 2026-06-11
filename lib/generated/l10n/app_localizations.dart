@@ -715,6 +715,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This world is locked. Please unlock it first.'**
   String get worldLockedPrompt;
+
+  /// No description provided for @contactDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Developer'**
+  String get contactDeveloper;
+
+  /// No description provided for @parentalGateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent Verification'**
+  String get parentalGateTitle;
+
+  /// No description provided for @parentalGateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This section is for parents only. Please answer the question to continue.'**
+  String get parentalGateDescription;
+
+  /// No description provided for @parentalGateWrongAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect answer. Please try again.'**
+  String get parentalGateWrongAnswer;
+
+  /// No description provided for @parentalGateContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get parentalGateContinue;
 }
 
 class _AppLocalizationsDelegate

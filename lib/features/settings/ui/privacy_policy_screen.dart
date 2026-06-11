@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minigenius/generated/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:minigenius/core/widgets/parental_gate_dialog.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -54,11 +56,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               '5. Advertisements',
               'We use Google AdMob to display advertisements. These ads are configured to be "child-directed" to ensure they are appropriate for our audience and comply with COPPA and GPDR-K regulations.',
             ),
-            _buildSection(
-              context,
-              '6. Contact Us',
-              'If you have any questions about this Privacy Policy, please contact us at: mohamed@albalahy4u.com',
-            ),
+            _buildContactSection(context, theme, l10n),
             const SizedBox(height: 40),
           ],
         ),
@@ -84,6 +82,51 @@ class PrivacyPolicyScreen extends StatelessWidget {
           Text(
             content,
             style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactSection(BuildContext context, ThemeData theme, AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '6. Contact Us',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'If you have any questions about this Privacy Policy, please contact us:',
+            style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: () async {
+              final isParent = await showParentalGateDialog(context);
+              if (isParent && context.mounted) {
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: 'mohamed@albalahy4u.com',
+                  query: 'subject=Mini Genius App Privacy Support',
+                );
+                try {
+                  if (!await launchUrl(emailLaunchUri)) {
+                    // Ignore
+                  }
+                } catch (e) {
+                  // Ignore
+                }
+              }
+            },
+            icon: const Icon(Icons.email),
+            label: Text(l10n.contactDeveloper),
           ),
         ],
       ),
