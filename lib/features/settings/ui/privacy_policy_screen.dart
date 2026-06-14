@@ -54,7 +54,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _buildSection(
               context,
               '5. Advertisements',
-              'We use Google AdMob to display advertisements. These ads are configured to be "child-directed" to ensure they are appropriate for our audience and comply with COPPA and GPDR-K regulations.',
+              'We use Google AdMob to display advertisements. These ads are configured to be "child-directed" to ensure they are appropriate for our audience and comply with COPPA and GPDR-K regulations. The ads displayed do not use personalized tracking or behavioral targeting. Furthermore, in compliance with Apple Guideline 1.3, we verify that the contextual advertising services we use utilize strict safety standards, including human review and automated evaluation of ad creatives by Google\'s policy teams, ensuring all served ads are age-appropriate for young audiences.',
             ),
             _buildContactSection(context, theme, l10n),
             const SizedBox(height: 40),
