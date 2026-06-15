@@ -39,7 +39,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _buildSection(
               context,
               '2. Children\'s Privacy',
-              'Our app is designed for children. We do not knowingly collect any personally identifiable information from children under the age of 13. All data processed is stored locally on the device or handled anonymously through third-party services like AdMob (child-directed).',
+              'Our app is designed for children. We do not knowingly collect any personally identifiable information from children under the age of 13. All data processed is stored locally on the device and is never transmitted to external servers.',
             ),
             _buildSection(
               context,
@@ -54,7 +54,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _buildSection(
               context,
               '5. Advertisements',
-              'We use Google AdMob to display advertisements. These ads are configured to be "child-directed" to ensure they are appropriate for our audience and comply with COPPA and GPDR-K regulations. The ads displayed do not use personalized tracking or behavioral targeting. Furthermore, in compliance with Apple Guideline 1.3, we verify that the contextual advertising services we use utilize strict safety standards, including human review and automated evaluation of ad creatives by Google\'s policy teams, ensuring all served ads are age-appropriate for young audiences.',
+              'Mini Genius does not display any third-party advertisements. The app is entirely ad-free. Unlocking premium content is available exclusively through Apple In-App Purchase (StoreKit), which is governed by Apple\'s own privacy and payment policies.',
             ),
             _buildContactSection(context, theme, l10n),
             const SizedBox(height: 40),
