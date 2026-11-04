@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/game_info.dart';
 import '../../../../core/services/storage_service.dart';
-import '../../../../core/services/tts_service.dart';
+import '../../../../core/services/vip_service.dart';
 import '../../../../core/models/game_progress.dart';
 import '../../../widgets/level_card.dart';
 import 'color_memory_game_screen.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/providers/app_state_provider.dart';
 
 class ColorMemorySelectScreen extends StatefulWidget {
   const ColorMemorySelectScreen({super.key});
@@ -31,43 +29,24 @@ class _ColorMemorySelectScreenState extends State<ColorMemorySelectScreen> {
         setState(() {
           _progress = _storageService.getOrCreateGameProgress('color_memory');
         });
-        
-        // Check if we have arguments (from world levels)
+
         final args = ModalRoute.of(context)?.settings.arguments;
         if (args != null && args is Map<String, dynamic>) {
           final level = args['level'] as int?;
           _worldId = args['worldId'] as String?;
           if (level != null) {
-            // Start the specified level directly
             Future.delayed(const Duration(milliseconds: 300), () {
               if (mounted) {
                 _startLevel(level);
               }
             });
-            return;
           }
         }
-        
-        // Speak description
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            final gameInfo = GameDefinitions.allGames.firstWhere((g) => g.id == 'color_memory');
-            final appState = context.read<AppStateProvider>();
-            TtsService().speak(gameInfo.description, appState.locale.languageCode);
-          }
-        });
       }
     });
   }
 
-  @override
-  void dispose() {
-    TtsService().stop();
-    super.dispose();
-  }
-
   void _startLevel(int levelNumber) {
-    TtsService().stop();
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -91,6 +70,7 @@ class _ColorMemorySelectScreenState extends State<ColorMemorySelectScreen> {
     final gameInfo = GameDefinitions.allGames.firstWhere(
       (g) => g.id == 'color_memory',
     );
+    final isAr = Directionality.of(context) == TextDirection.rtl;
 
     if (_progress == null) {
       return Scaffold(
@@ -102,6 +82,8 @@ class _ColorMemorySelectScreenState extends State<ColorMemorySelectScreen> {
         ),
       );
     }
+
+    final isVipUser = VipService().isUserVip(_storageService);
 
     return Scaffold(
       appBar: AppBar(
@@ -119,49 +101,106 @@ class _ColorMemorySelectScreenState extends State<ColorMemorySelectScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  gameInfo.description,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppTheme.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                child: Column(
+                  children: [
+                    Text(
+                      gameInfo.description,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: AppTheme.white,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                  textAlign: TextAlign.center,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.check_circle_outline, color: AppTheme.mintGreen, size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            isAr ? 'المراحل 1-10 مجانية' : 'Levels 1-10 Free',
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                          const SizedBox(width: 12),
+                          const Icon(Icons.workspace_premium, color: Color(0xFFFFD54F), size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            isAr ? 'المراحل 11-20 للمحترفين VIP' : 'Levels 11-20 VIP Pro',
+                            style: const TextStyle(color: Color(0xFFFFD54F), fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 5,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
                       childAspectRatio: 1.0,
                     ),
-                    itemCount: 10,
+                    itemCount: VipService.totalLevelsPerGame,
                     itemBuilder: (context, index) {
                       final levelNumber = index + 1;
+                      final isVip = VipService.isVipLevel(levelNumber);
                       final levelProgress = _progress!.levels[levelNumber];
+
                       bool isUnlocked = false;
-                      if (levelNumber == 1) {
-                        isUnlocked = true;
-                      } else {
-                        isUnlocked = true;
-                        for (int i = 1; i < levelNumber; i++) {
-                          if (!(_progress!.levels[i]?.isCompleted ?? false)) {
-                            isUnlocked = false;
-                            break;
+
+                      if (!isVip) {
+                        if (levelNumber == 1) {
+                          isUnlocked = true;
+                        } else {
+                          isUnlocked = true;
+                          for (int i = 1; i < levelNumber; i++) {
+                            if (!(_progress!.levels[i]?.isCompleted ?? false)) {
+                              isUnlocked = false;
+                              break;
+                            }
                           }
+                        }
+                      } else {
+                        if (isVipUser) {
+                          isUnlocked = true;
+                          for (int i = 1; i < levelNumber; i++) {
+                            if (!(_progress!.levels[i]?.isCompleted ?? false)) {
+                              isUnlocked = false;
+                              break;
+                            }
+                          }
+                        } else {
+                          isUnlocked = false;
                         }
                       }
 
                       return LevelCard(
                         levelNumber: levelNumber,
                         isUnlocked: isUnlocked,
+                        isVip: isVip,
                         stars: levelProgress?.stars ?? 0,
-                        onTap:
-                            isUnlocked ? () => _startLevel(levelNumber) : null,
+                        onTap: () {
+                          if (isVip && !isVipUser) {
+                            VipService().showVipLockedDialog(
+                              context,
+                              gameName: gameInfo.name,
+                              levelNumber: levelNumber,
+                            );
+                          } else if (isUnlocked) {
+                            _startLevel(levelNumber);
+                          }
+                        },
                       );
                     },
                   ),

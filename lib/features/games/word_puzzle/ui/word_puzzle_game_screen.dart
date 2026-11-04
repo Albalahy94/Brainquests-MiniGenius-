@@ -98,6 +98,56 @@ class _WordPuzzleGameScreenState extends State<WordPuzzleGameScreen> {
       'hint': 'فاكهة حمراء',
       'letters': ['A', 'P', 'P', 'L', 'E']
     },
+    // VIP Pro Words (Levels 11-20)
+    {
+      'word': 'PLANET',
+      'wordAr': 'كوكب',
+      'hint': 'جرم سماوي يدور حول الشمس',
+      'letters': ['P', 'L', 'A', 'N', 'E', 'T'],
+      'isVip': true,
+    },
+    {
+      'word': 'GALAXY',
+      'wordAr': 'مجرة',
+      'hint': 'تجمع هائل من النجوم',
+      'letters': ['G', 'A', 'L', 'A', 'X', 'Y'],
+      'isVip': true,
+    },
+    {
+      'word': 'CASTLE',
+      'wordAr': 'قلعة',
+      'hint': 'حصن ملوكي قديم',
+      'letters': ['C', 'A', 'S', 'T', 'L', 'E'],
+      'isVip': true,
+    },
+    {
+      'word': 'DOLPHIN',
+      'wordAr': 'دلفين',
+      'hint': 'حيوان بحري ذكي وودود',
+      'letters': ['D', 'O', 'L', 'P', 'H', 'I', 'N'],
+      'isVip': true,
+    },
+    {
+      'word': 'RAINBOW',
+      'wordAr': 'قوس قزح',
+      'hint': 'ألوان جميلة تظهر بعد المطر',
+      'letters': ['R', 'A', 'I', 'N', 'B', 'O', 'W'],
+      'isVip': true,
+    },
+    {
+      'word': 'DIAMOND',
+      'wordAr': 'ألماس',
+      'hint': 'حجر كريم ثمين ولامع',
+      'letters': ['D', 'I', 'A', 'M', 'O', 'N', 'D'],
+      'isVip': true,
+    },
+    {
+      'word': 'FALCON',
+      'wordAr': 'صقر',
+      'hint': 'طائر جارح سريع وقوي',
+      'letters': ['F', 'A', 'L', 'C', 'O', 'N'],
+      'isVip': true,
+    },
   ];
 
   String _currentWord = '';
@@ -151,7 +201,12 @@ class _WordPuzzleGameScreenState extends State<WordPuzzleGameScreen> {
 
   void _generateWord() {
     final random = Random();
-    final wordData = _words[random.nextInt(_words.length)];
+    final candidateWords = widget.level > 10
+        ? _words.where((w) => w['isVip'] == true).toList()
+        : _words.where((w) => w['isVip'] != true).toList();
+    final wordData = candidateWords.isNotEmpty
+        ? candidateWords[random.nextInt(candidateWords.length)]
+        : _words[random.nextInt(_words.length)];
     _currentWord = wordData['word'] as String;
     _currentWordAr = wordData['wordAr'] as String;
     _currentHint = wordData['hint'] as String;
@@ -290,7 +345,7 @@ class _WordPuzzleGameScreenState extends State<WordPuzzleGameScreen> {
     );
     progress.updateLevel(widget.level, levelProgress);
 
-    if (widget.level < 10) {
+    if (widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
       if (nextLevelProgress == null) {

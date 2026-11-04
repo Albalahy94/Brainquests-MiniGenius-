@@ -84,10 +84,12 @@ class _PatternLogicGameScreenState extends State<PatternLogicGameScreen> {
   void _generateRound() {
     final random = Random();
     int patternLength = 3 + (widget.level ~/ 2);
-    patternLength = min(patternLength, 8);
+    patternLength = min(patternLength, widget.level > 10 ? 10 : 8);
 
     // Simple repeating pattern
-    int repeatLength = widget.level <= 3 ? 2 : (widget.level <= 6 ? 3 : 4);
+    int repeatLength = widget.level <= 3
+        ? 2
+        : (widget.level <= 6 ? 3 : (widget.level <= 10 ? 4 : 5));
     List<PatternItem> base = List.generate(repeatLength, (i) {
       return PatternItem(
         color: _colors[i % min(4 + widget.level ~/ 2, _colors.length)],
@@ -123,7 +125,9 @@ class _PatternLogicGameScreenState extends State<PatternLogicGameScreen> {
   }
 
   void _onOptionSelected(PatternItem option) {
-    final repeatLength = widget.level <= 3 ? 2 : (widget.level <= 6 ? 3 : 4);
+    final repeatLength = widget.level <= 3
+        ? 2
+        : (widget.level <= 6 ? 3 : (widget.level <= 10 ? 4 : 5));
     final correctIndex = _pattern.length % repeatLength;
     final correctAnswer = _pattern[correctIndex];
 
@@ -187,7 +191,7 @@ class _PatternLogicGameScreenState extends State<PatternLogicGameScreen> {
     );
     progress.updateLevel(widget.level, levelProgress);
 
-    if (widget.level < 15) {
+    if (widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
 

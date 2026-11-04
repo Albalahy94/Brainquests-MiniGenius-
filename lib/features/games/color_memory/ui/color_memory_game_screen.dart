@@ -43,14 +43,16 @@ class _ColorMemoryGameScreenState extends State<ColorMemoryGameScreen> {
     Colors.purple,
     Colors.orange,
     Colors.pink,
+    Colors.cyanAccent,
+    const Color(0xFFFF6D00),
   ];
 
   @override
   void initState() {
     super.initState();
     _gameStartTime = DateTime.now();
-    _sequenceLength = 3 + (widget.level ~/ 2); // 3-8 steps
-    _sequenceLength = min(_sequenceLength, 10);
+    _sequenceLength = 3 + (widget.level ~/ 2); // 3-12 steps
+    _sequenceLength = min(_sequenceLength, widget.level > 10 ? 12 : 8);
     _maxRounds = 3 + (widget.level ~/ 3);
     _startNewRound();
   }
@@ -170,7 +172,7 @@ class _ColorMemoryGameScreenState extends State<ColorMemoryGameScreen> {
     );
     progress.updateLevel(widget.level, levelProgress);
 
-    if (widget.level < 15) {
+    if (widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
 

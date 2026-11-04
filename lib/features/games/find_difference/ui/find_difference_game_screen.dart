@@ -5,6 +5,7 @@ import '../../../../core/services/storage_service.dart';
 import '../../../../core/models/game_progress.dart';
 import '../../../results/ui/result_screen.dart';
 import '../../widgets/game_header.dart';
+import '../models/difference_theme.dart';
 
 class FindDifferenceGameScreen extends StatefulWidget {
   final int level;
@@ -23,32 +24,15 @@ class FindDifferenceGameScreen extends StatefulWidget {
       _FindDifferenceGameScreenState();
 }
 
-class DifferenceItem {
-  final int id;
-  final Offset position; // Relative position 0.0 - 1.0
-  final Widget overlay;
-  final double size;
-  bool isFound;
-
-  DifferenceItem({
-    required this.id,
-    required this.position,
-    required this.overlay,
-    this.size = 40.0,
-    this.isFound = false,
-  });
-}
-
 class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
-  late List<DifferenceItem> _differences;
+  late DifferenceScene _scene;
+  late List<DifferenceSpot> _differences;
   int _foundDifferences = 0;
   int _timeElapsed = 0;
   bool _isGameComplete = false;
   late int _totalDifferences;
   late DateTime _gameStartTime;
-
-  // Default image
-  final String _imagePath = 'assets/images/cartoon_park.png';
+  int? _hintedSpotId;
 
   @override
   void initState() {
@@ -59,52 +43,10 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
   }
 
   void _initializeGame() {
-    _differences = _getLevelDifferences(widget.level);
+    _scene = DifferenceLibrary.getSceneForLevel(widget.level);
+    _differences = _scene.differences.map((d) => d.clone()).toList();
     _totalDifferences = _differences.length;
-  }
-
-  List<DifferenceItem> _getLevelDifferences(int level) {
-    // Example differences (extra items on Image B)
-    final List<DifferenceItem> allPossible = [
-      DifferenceItem(
-        id: 0,
-        position: const Offset(0.15, 0.25),
-        overlay: const Icon(Icons.cloud, color: Colors.white, size: 30),
-      ),
-      DifferenceItem(
-        id: 1,
-        position: const Offset(0.65, 0.65),
-        overlay: const Icon(Icons.local_florist, color: Colors.pink, size: 25),
-      ),
-      DifferenceItem(
-        id: 2,
-        position: const Offset(0.85, 0.35),
-        overlay: const Icon(Icons.air, color: Colors.lightBlueAccent, size: 30),
-      ),
-      DifferenceItem(
-        id: 3,
-        position: const Offset(0.3, 0.8),
-        overlay: const Icon(Icons.grass, color: Colors.greenAccent, size: 28),
-      ),
-      DifferenceItem(
-        id: 4,
-        position: const Offset(0.5, 0.5),
-        overlay: const Icon(Icons.star, color: Colors.yellow, size: 25),
-      ),
-      DifferenceItem(
-        id: 5,
-        position: const Offset(0.2, 0.55),
-        overlay: const Icon(Icons.pets, color: Colors.brown, size: 22),
-      ),
-    ];
-
-    // Fixed seed per level for consistency
-    final random = Random(level);
-    final count = level <= 3 ? 3 : (level <= 6 ? 4 : 5);
-
-    // Shuffle and take 'count' items
-    List<DifferenceItem> selected = List.from(allPossible)..shuffle(random);
-    return selected.take(count).toList();
+    _foundDifferences = 0;
   }
 
   void _startTimer() {
@@ -118,12 +60,15 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
     });
   }
 
-  void _onSpotTap(DifferenceItem item) {
+  void _onSpotTap(DifferenceSpot item) {
     if (item.isFound || _isGameComplete) return;
 
     setState(() {
       item.isFound = true;
       _foundDifferences++;
+      if (_hintedSpotId == item.id) {
+        _hintedSpotId = null;
+      }
     });
 
     if (_foundDifferences == _totalDifferences) {
@@ -131,18 +76,65 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
     }
   }
 
+  void _onImageTap(TapUpDetails details, BoxConstraints constraints) {
+    if (_isGameComplete) return;
+
+    final clickX = details.localPosition.dx / constraints.maxWidth;
+    final clickY = details.localPosition.dy / constraints.maxHeight;
+
+    // Search for closest unfound difference within hit tolerance
+    DifferenceSpot? nearest;
+    double minDistance = 0.14; // normalized hit radius
+
+    for (final spot in _differences) {
+      if (spot.isFound) continue;
+      final dist = sqrt(pow(clickX - spot.x, 2) + pow(clickY - spot.y, 2));
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearest = spot;
+      }
+    }
+
+    if (nearest != null) {
+      _onSpotTap(nearest);
+    }
+  }
+
+  void _giveHint() {
+    if (_isGameComplete) return;
+    final unfound = _differences.where((d) => !d.isFound).toList();
+    if (unfound.isEmpty) return;
+
+    setState(() {
+      _hintedSpotId = unfound.first.id;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          Directionality.of(context) == TextDirection.rtl
+              ? 'تلميح: ابحث عن ${unfound.first.hintAr}'
+              : 'Hint: Look for ${unfound.first.hintEn}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFFFF6B6B),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   void _gameComplete() {
     _isGameComplete = true;
 
     // Calculate stars based on time
     int stars = 3;
-    int maxTime = _totalDifferences * 10;
+    int maxTime = _totalDifferences * 12;
     if (_timeElapsed > maxTime * 0.8) stars = 2;
-    if (_timeElapsed > maxTime * 1.2) stars = 1;
+    if (_timeElapsed > maxTime * 1.3) stars = 1;
 
     // Calculate points
-    int points = (150 * widget.level) - (_timeElapsed * 3);
-    if (points < 10) points = 10;
+    int points = (160 * widget.level) - (_timeElapsed * 2);
+    if (points < 20) points = 20;
 
     // Save progress
     final progress =
@@ -157,7 +149,7 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
     );
     progress.updateLevel(widget.level, levelProgress);
 
-    if (widget.level < 10) {
+    if (widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
 
@@ -175,7 +167,8 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
 
     widget.storageService.saveGameProgress(progress);
 
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -193,151 +186,377 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
     });
   }
 
-  Widget _buildImageStack({required bool isImageB}) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
-          fit: StackFit.loose,
-          children: [
-            // The Base Image
-            Positioned.fill(
-              child: Image.asset(
-                _imagePath,
-                fit: BoxFit.cover,
+  Widget _buildSceneCanvas({required bool isImageB, required BoxConstraints constraints}) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapUp: (details) => _onImageTap(details, constraints),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background Gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: _scene.backgroundGradient,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
+          ),
 
-            // The Differences (Overlays) - Only shown on Image B
-            if (isImageB)
-              ..._differences.map((item) {
-                return Positioned(
-                  left: item.position.dx * constraints.maxWidth,
-                  top: item.position.dy * constraints.maxHeight,
-                  child: IgnorePointer(
-                    child: item.overlay,
-                  ),
-                );
-              }),
+          // Ground / Horizon ambient styling
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: constraints.maxHeight * 0.35,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black.withOpacity(0.0),
+                    Colors.black.withOpacity(0.18),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+          ),
 
-            // Hit Targets (Both images)
-            ..._differences.map((item) {
+          // Base Elements (Identical on both Image A and Image B)
+          ..._scene.baseElements.map((el) {
+            return Positioned(
+              left: (el.x * constraints.maxWidth) - (el.size / 2),
+              top: (el.y * constraints.maxHeight) - (el.size / 2),
+              child: IgnorePointer(
+                child: Icon(
+                  el.icon,
+                  color: el.color,
+                  size: el.size,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.35),
+                      blurRadius: 4,
+                      offset: const Offset(1, 2),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+
+          // Differences - ONLY rendered on Image B (Compare)
+          if (isImageB)
+            ..._differences.map((spot) {
+              final isHinted = _hintedSpotId == spot.id && !spot.isFound;
               return Positioned(
-                left: (item.position.dx * constraints.maxWidth) - 10,
-                top: (item.position.dy * constraints.maxHeight) - 10,
-                child: GestureDetector(
-                  onTap: () => _onSpotTap(item),
+                left: (spot.x * constraints.maxWidth) - (spot.size / 2),
+                top: (spot.y * constraints.maxHeight) - (spot.size / 2),
+                child: IgnorePointer(
                   child: Container(
-                    width: item.size + 20,
-                    height: item.size + 20,
-                    color: Colors.transparent, // Hit test target
-                    child: Center(
-                      child: item.isFound
-                          ? Container(
-                              width: item.size + 10,
-                              height: item.size + 10,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: AppTheme.mintGreen, width: 3),
-                                color: AppTheme.mintGreen.withOpacity(0.3),
+                    padding: isHinted ? const EdgeInsets.all(4) : EdgeInsets.zero,
+                    decoration: isHinted
+                        ? BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.amber, width: 3),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.amber.withOpacity(0.6),
+                                blurRadius: 10,
+                                spreadRadius: 2,
                               ),
-                              child: const Icon(Icons.check,
-                                  color: AppTheme.white, size: 20),
-                            )
-                          : null,
+                            ],
+                          )
+                        : null,
+                    child: Icon(
+                      spot.icon,
+                      color: spot.color,
+                      size: spot.size,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 6,
+                          offset: const Offset(1, 2),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               );
             }),
-          ],
-        );
-      },
+
+          // Found Markers (Rendered on BOTH Image A and Image B with celebration checkmark ring)
+          ..._differences.where((spot) => spot.isFound).map((spot) {
+            final markerSize = spot.size + 14;
+            return Positioned(
+              left: (spot.x * constraints.maxWidth) - (markerSize / 2),
+              top: (spot.y * constraints.maxHeight) - (markerSize / 2),
+              child: IgnorePointer(
+                child: Container(
+                  width: markerSize,
+                  height: markerSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppTheme.mintGreen, width: 3),
+                    color: AppTheme.mintGreen.withOpacity(0.28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.mintGreen.withOpacity(0.5),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+
+          // Corner Label (Original vs Compare)
+          Positioned(
+            top: 6,
+            left: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.45),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                isImageB
+                    ? (Directionality.of(context) == TextDirection.rtl ? 'الصورة ٢' : 'Image B')
+                    : (Directionality.of(context) == TextDirection.rtl ? 'الأصلية' : 'Image A'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Directionality.of(context) == TextDirection.rtl;
+    final sceneTitle = isAr ? _scene.titleAr : _scene.titleEn;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
           gradient: AppTheme.blueGradient,
         ),
-        child: Column(
-          children: [
-            // Game Header
-            GameHeader(
-              level: widget.level,
-              score: '$_foundDifferences/$_totalDifferences',
-              timer:
-                  '${_timeElapsed ~/ 60}:${(_timeElapsed % 60).toString().padLeft(2, '0')}',
-              onExit: () => Navigator.pop(context),
-            ),
-            // Game Area
-            Expanded(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                child: Row(
-                  children: [
-                    // Left Image
-                    Expanded(
-                      child: Container(
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Game Header
+              GameHeader(
+                level: widget.level,
+                score: '$_foundDifferences/$_totalDifferences',
+                timer:
+                    '${_timeElapsed ~/ 60}:${(_timeElapsed % 60).toString().padLeft(2, '0')}',
+                onExit: () => Navigator.pop(context),
+              ),
+
+              // Level Theme Title Badge
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(_scene.mainIcon, color: Colors.amber, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        sceneTitle,
+                        style: const TextStyle(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white, width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Game Comparison Area (Responsive side-by-side)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isLandscape = constraints.maxWidth > constraints.maxHeight;
+
+                      if (isLandscape) {
+                        return Row(
+                          children: [
+                            // Left Image
+                            Expanded(
+                              child: Container(
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.25),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (c, innerBox) => _buildSceneCanvas(
+                                    isImageB: false,
+                                    constraints: innerBox,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            // Right Image
+                            Expanded(
+                              child: Container(
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.25),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (c, innerBox) => _buildSceneCanvas(
+                                    isImageB: true,
+                                    constraints: innerBox,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
-                        ),
-                        child: _buildImageStack(isImageB: false),
+                        );
+                      } else {
+                        // Portrait: stacked top and bottom
+                        return Column(
+                          children: [
+                            // Top Image
+                            Expanded(
+                              child: Container(
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.25),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (c, innerBox) => _buildSceneCanvas(
+                                    isImageB: false,
+                                    constraints: innerBox,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Bottom Image
+                            Expanded(
+                              child: Container(
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.25),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (c, innerBox) => _buildSceneCanvas(
+                                    isImageB: true,
+                                    constraints: innerBox,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ),
+
+              // Bottom Bar: Instructions & Hint Button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Status text
+                    Text(
+                      isAr
+                          ? 'ابحث عن $_totalDifferences فروقات بين الصورتين!'
+                          : 'Find $_totalDifferences differences!',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-
-                    const SizedBox(width: 12),
-
-                    // Right Image
-                    Expanded(
-                      child: Container(
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white, width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                    // Hint Button
+                    ElevatedButton.icon(
+                      onPressed: _giveHint,
+                      icon: const Icon(Icons.lightbulb_rounded, color: Colors.amber, size: 20),
+                      label: Text(
+                        isAr ? 'تلميح' : 'Hint',
+                        style: TextStyle(
+                          color: Color(0xFF2C3E50),
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: _buildImageStack(isImageB: true),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Find $_totalDifferences differences!',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppTheme.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

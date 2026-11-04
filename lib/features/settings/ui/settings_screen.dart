@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:minigenius/core/widgets/parental_gate_dialog.dart';
+import 'package:minigenius/core/widgets/redeem_code_dialog.dart';
 import 'package:minigenius/generated/l10n/app_localizations.dart';
 import 'package:minigenius/core/theme/app_theme.dart';
 import 'package:minigenius/core/providers/app_state_provider.dart';
@@ -24,6 +25,32 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          _buildSectionHeader(context, 'Brainquests Pro 👑'),
+          ListTile(
+            leading: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFFB300), size: 28),
+            title: const Text('ترقية الحساب / إدارة الاشتراك', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('فتح +100 مستوى ورادار الذكاء المعرفي وثيمات الألعاب'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () async {
+              final isParent = await showParentalGateDialog(context);
+              if (isParent && context.mounted) {
+                Navigator.pushNamed(context, AppRoutes.premium);
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.vpn_key_rounded, color: AppTheme.primaryBlue, size: 26),
+            title: const Text('تفعيل كود ترقية VIP', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('إدخال كود الترخيص الصادر من بوابة البلحي أو الدعم الفني'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () async {
+              final isParent = await showParentalGateDialog(context);
+              if (isParent && context.mounted) {
+                await showRedeemCodeDialog(context);
+              }
+            },
+          ),
+          const Divider(),
           _buildSectionHeader(context, l10n.appearance),
           
           // Dark Mode Switch
@@ -105,6 +132,41 @@ class SettingsScreen extends StatelessWidget {
                   }
                 } catch (e) {
                   // Ignore
+                }
+              }
+            },
+          ),
+
+          // WhatsApp Direct Support
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF25D366),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.chat_rounded, color: Colors.white, size: 20),
+            ),
+            title: const Text(
+              'الدعم الفني المباشر (WhatsApp)',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text('+20 106 748 1561 - متاح للمساعدة الفورية وتفعيل الاشتراكات'),
+            trailing: const Icon(Icons.open_in_new, size: 16, color: Color(0xFF25D366)),
+            onTap: () async {
+              final isParent = await showParentalGateDialog(context);
+              if (isParent && context.mounted) {
+                final Uri waUri = Uri.parse(
+                  'https://wa.me/201067481561?text=${Uri.encodeComponent("مرحباً، أطلب الدعم الفني لتطبيق Brainquests v2")}',
+                );
+                try {
+                  await launchUrl(waUri, mode: LaunchMode.externalApplication);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('تعذر فتح واتساب، يرجى التواصل على الرقم: 01067481561'),
+                    ),
+                  );
                 }
               }
             },

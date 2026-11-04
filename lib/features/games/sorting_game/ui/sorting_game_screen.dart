@@ -113,7 +113,15 @@ class _SortingGameScreenState extends State<SortingGameScreen> {
         ));
       }
     } else {
-      final shapes = [ItemShape.circle, ItemShape.square, ItemShape.triangle];
+      final shapes = widget.level >= 11
+          ? [
+              ItemShape.circle,
+              ItemShape.square,
+              ItemShape.triangle,
+              ItemShape.star,
+              ItemShape.diamond,
+            ]
+          : [ItemShape.circle, ItemShape.square, ItemShape.triangle];
       for (int i = 0; i < itemCount; i++) {
         final shape = shapes[random.nextInt(shapes.length)];
         _items.add(SortItem(
@@ -264,7 +272,7 @@ class _SortingGameScreenState extends State<SortingGameScreen> {
     );
     progress.updateLevel(widget.level, levelProgress);
 
-    if (widget.level < 10) {
+    if (widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
       if (nextLevelProgress == null) {
@@ -448,6 +456,30 @@ class _SortingGameScreenState extends State<SortingGameScreen> {
           painter: TrianglePainter(item.color),
         );
         break;
+      case ItemShape.star:
+        shape = Icon(
+          Icons.star_rounded,
+          color: item.color,
+          size: size *
+              (item.size == ItemSize.small
+                  ? 0.7
+                  : item.size == ItemSize.medium
+                      ? 0.9
+                      : 1.1),
+        );
+        break;
+      case ItemShape.diamond:
+        shape = Icon(
+          Icons.diamond_rounded,
+          color: item.color,
+          size: size *
+              (item.size == ItemSize.small
+                  ? 0.7
+                  : item.size == ItemSize.medium
+                      ? 0.9
+                      : 1.1),
+        );
+        break;
     }
 
     return Container(
@@ -473,7 +505,7 @@ enum SortCategory { color, size, shape }
 
 enum ItemSize { small, medium, large }
 
-enum ItemShape { circle, square, triangle }
+enum ItemShape { circle, square, triangle, star, diamond }
 
 class SortItem {
   final Color color;

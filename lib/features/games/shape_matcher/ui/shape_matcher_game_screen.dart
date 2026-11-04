@@ -80,6 +80,15 @@ class _ShapeMatcherGameScreenState extends State<ShapeMatcherGameScreen> {
     if (widget.level >= 8) {
       availableShapes.add(ShapeType.hexagon);
     }
+    if (widget.level >= 11) {
+      // VIP exclusive shapes for levels 11-20
+      availableShapes.addAll([
+        ShapeType.diamond,
+        ShapeType.crescent,
+        ShapeType.cloud,
+        ShapeType.octagon,
+      ]);
+    }
 
     List<Color> availableColors = [
       AppTheme.primaryBlue,
@@ -379,6 +388,31 @@ class _ShapeMatcherGameScreenState extends State<ShapeMatcherGameScreen> {
           color: shape.color,
         );
         break;
+      case ShapeType.diamond:
+        shapeWidget = CustomPaint(
+          size: Size(size, size),
+          painter: DiamondPainter(shape.color),
+        );
+        break;
+      case ShapeType.crescent:
+        shapeWidget = CustomPaint(
+          size: Size(size, size),
+          painter: CrescentPainter(shape.color),
+        );
+        break;
+      case ShapeType.cloud:
+        shapeWidget = Icon(
+          Icons.cloud_rounded,
+          size: size,
+          color: shape.color,
+        );
+        break;
+      case ShapeType.octagon:
+        shapeWidget = CustomPaint(
+          size: Size(size, size),
+          painter: OctagonPainter(shape.color),
+        );
+        break;
     }
     return shapeWidget;
   }
@@ -411,7 +445,19 @@ class ShapeOption {
   ShapeOption({required this.shape, required this.isCorrect});
 }
 
-enum ShapeType { circle, square, triangle, star, pentagon, hexagon, heart }
+enum ShapeType {
+  circle,
+  square,
+  triangle,
+  star,
+  pentagon,
+  hexagon,
+  heart,
+  diamond,
+  crescent,
+  cloud,
+  octagon,
+}
 
 class TrianglePainter extends CustomPainter {
   final Color color;
@@ -477,6 +523,84 @@ class HexagonPainter extends CustomPainter {
 
     for (int i = 0; i < 6; i++) {
       final angle = (i * 2 * pi / 6) - (pi / 2);
+      final x = center.dx + radius * cos(angle);
+      final y = center.dy + radius * sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class DiamondPainter extends CustomPainter {
+  final Color color;
+
+  DiamondPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    final path = Path()
+      ..moveTo(size.width / 2, 0)
+      ..lineTo(size.width, size.height / 2)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(0, size.height / 2)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class CrescentPainter extends CustomPainter {
+  final Color color;
+
+  CrescentPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    final path = Path()
+      ..addOval(Rect.fromCircle(center: center, radius: radius));
+
+    final innerPath = Path()
+      ..addOval(Rect.fromCircle(
+          center: Offset(center.dx + radius * 0.45, center.dy - radius * 0.1),
+          radius: radius * 0.82));
+
+    final crescent = Path.combine(PathOperation.difference, path, innerPath);
+    canvas.drawPath(crescent, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class OctagonPainter extends CustomPainter {
+  final Color color;
+
+  OctagonPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    final path = Path();
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    for (int i = 0; i < 8; i++) {
+      final angle = (i * 2 * pi / 8) - (pi / 8);
       final x = center.dx + radius * cos(angle);
       final y = center.dy + radius * sin(angle);
       if (i == 0) {

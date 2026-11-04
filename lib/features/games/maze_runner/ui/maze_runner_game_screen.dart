@@ -41,8 +41,8 @@ class _MazeRunnerGameScreenState extends State<MazeRunnerGameScreen> {
   void initState() {
     super.initState();
     _gameStartTime = DateTime.now();
-    _mazeSize = 5 + (widget.level ~/ 2); // 5x5 to 10x10
-    _timeRemaining = 90 - (widget.level * 3);
+    _mazeSize = min(5 + (widget.level ~/ 2), 14); // 5x5 up to 14x14
+    _timeRemaining = max(90 - (widget.level * 2), 40);
     _generateMaze();
     _startTimer();
   }
@@ -162,7 +162,7 @@ class _MazeRunnerGameScreenState extends State<MazeRunnerGameScreen> {
     );
     progress.updateLevel(widget.level, levelProgress);
 
-    if (success && widget.level < 10) {
+    if (success && widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
       if (nextLevelProgress == null) {

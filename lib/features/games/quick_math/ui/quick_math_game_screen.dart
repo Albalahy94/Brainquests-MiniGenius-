@@ -73,54 +73,76 @@ class _QuickMathGameScreenState extends State<QuickMathGameScreen> {
     int num2 = 0;
     String operation = '+';
     int correctAnswer = 0;
+    String? customExpr;
 
     // Difficulty scaling
     // Level 1-3: Add/Sub, Max 20
     // Level 4-6: Add/Sub/Mul, Max 50
     // Level 7-9: All ops, Max 100
-    // Level 10+: All ops, Max 200, harder Div
+    // Level 10: All ops, Max 200
+    // Level 11-20 (VIP Pro): Multi-term equations, fast multiplication & mental agility
 
-    int maxNum = 20;
-    List<String> allowedOps = ['+', '-'];
-
-    if (widget.level >= 4) {
-      maxNum = 50;
-      allowedOps.add('*');
-    }
-    if (widget.level >= 7) {
-      maxNum = 100;
-      allowedOps.add('/');
-    }
-    if (widget.level >= 10) {
-      maxNum = 200;
-    }
-
-    operation = allowedOps[random.nextInt(allowedOps.length)];
-
-    switch (operation) {
-      case '+':
-        num1 = random.nextInt(maxNum) + 1;
-        num2 = random.nextInt(maxNum) + 1;
-        correctAnswer = num1 + num2;
-        break;
-      case '-':
-        num1 = random.nextInt(maxNum) + 1;
-        num2 = random.nextInt(num1) + 1; // Ensure positive result
-        correctAnswer = num1 - num2;
-        break;
-      case '*':
-        // Keep multiplication result reasonable
-        int limit = widget.level >= 7 ? 20 : 10;
-        num1 = random.nextInt(limit) + 1;
-        num2 = random.nextInt(10) + 1;
+    if (widget.level >= 11) {
+      final isThreeTerms = random.nextBool();
+      if (isThreeTerms) {
+        // Multi-term math e.g. a * b + c or a + b - c
+        int a = random.nextInt(9) + 2;
+        int b = random.nextInt(5) + 2;
+        int c = random.nextInt(10) + 1;
+        if (random.nextBool()) {
+          correctAnswer = (a * b) + c;
+          customExpr = '$a × $b + $c';
+        } else {
+          correctAnswer = (a * b) - c;
+          customExpr = '$a × $b - $c';
+        }
+      } else {
+        num1 = random.nextInt(7) + 6; // Tables 6 to 12
+        num2 = random.nextInt(9) + 2;
+        operation = '*';
         correctAnswer = num1 * num2;
-        break;
-      case '/':
-        // Create integer division
-        num2 = random.nextInt(10) + 2; // Avoid divide by 1
-        correctAnswer = random.nextInt(10) + 1;
-        num1 = num2 * correctAnswer;
-        break;
+      }
+    } else {
+      int maxNum = 20;
+      List<String> allowedOps = ['+', '-'];
+
+      if (widget.level >= 4) {
+        maxNum = 50;
+        allowedOps.add('*');
+      }
+      if (widget.level >= 7) {
+        maxNum = 100;
+        allowedOps.add('/');
+      }
+      if (widget.level >= 10) {
+        maxNum = 200;
+      }
+
+      operation = allowedOps[random.nextInt(allowedOps.length)];
+
+      switch (operation) {
+        case '+':
+          num1 = random.nextInt(maxNum) + 1;
+          num2 = random.nextInt(maxNum) + 1;
+          correctAnswer = num1 + num2;
+          break;
+        case '-':
+          num1 = random.nextInt(maxNum) + 1;
+          num2 = random.nextInt(num1) + 1; // Ensure positive result
+          correctAnswer = num1 - num2;
+          break;
+        case '*':
+          int limit = widget.level >= 7 ? 20 : 10;
+          num1 = random.nextInt(limit) + 1;
+          num2 = random.nextInt(10) + 1;
+          correctAnswer = num1 * num2;
+          break;
+        case '/':
+          num2 = random.nextInt(10) + 2;
+          correctAnswer = random.nextInt(10) + 1;
+          num1 = num2 * correctAnswer;
+          break;
+      }
     }
 
     // Generate unique options
@@ -130,7 +152,6 @@ class _QuickMathGameScreenState extends State<QuickMathGameScreen> {
       bool add = random.nextBool();
       int wrong = add ? correctAnswer + offset : correctAnswer - offset;
       if (wrong >= 0) {
-        // No negative options
         options.add(wrong);
       }
     }
@@ -143,6 +164,7 @@ class _QuickMathGameScreenState extends State<QuickMathGameScreen> {
       operation: operation,
       correctAnswer: correctAnswer,
       options: optionList,
+      customExpression: customExpr,
     );
   }
 
@@ -210,7 +232,7 @@ class _QuickMathGameScreenState extends State<QuickMathGameScreen> {
     );
     progress.updateLevel(widget.level, levelProgress);
 
-    if (widget.level < 10) {
+    if (widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
 
@@ -278,7 +300,8 @@ class _QuickMathGameScreenState extends State<QuickMathGameScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '${_currentProblem.num1} ${_currentProblem.operationDisplay} ${_currentProblem.num2}',
+                        _currentProblem.customExpression ??
+                            '${_currentProblem.num1} ${_currentProblem.operationDisplay} ${_currentProblem.num2}',
                         style:
                             Theme.of(context).textTheme.displayLarge?.copyWith(
                                   color: AppTheme.white,
@@ -347,6 +370,7 @@ class MathProblem {
   final String operation;
   final int correctAnswer;
   final List<int> options;
+  final String? customExpression;
 
   MathProblem({
     required this.num1,
@@ -354,6 +378,7 @@ class MathProblem {
     required this.operation,
     required this.correctAnswer,
     required this.options,
+    this.customExpression,
   });
 
   String get operationDisplay {

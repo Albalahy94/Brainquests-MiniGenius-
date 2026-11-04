@@ -74,8 +74,12 @@ class _MemoryCardsGameScreenState extends State<MemoryCardsGameScreen> {
       totalCards = 16; // 8 pairs
     } else if (widget.level <= 10) {
       totalCards = 20; // 10 pairs
+    } else if (widget.level <= 13) {
+      totalCards = 24; // 12 pairs (VIP Pro)
+    } else if (widget.level <= 16) {
+      totalCards = 28; // 14 pairs (VIP Master)
     } else {
-      totalCards = 24; // 12 pairs (Harder level)
+      totalCards = 32; // 16 pairs (VIP Grandmaster)
     }
 
     _totalPairs = totalCards ~/ 2;
@@ -99,6 +103,30 @@ class _MemoryCardsGameScreenState extends State<MemoryCardsGameScreen> {
   }
 
   List<IconData> _getIconsForLevel() {
+    if (widget.level > 10) {
+      // VIP exclusive icon themes (Space, Adventure & Wonder)
+      return [
+        Icons.rocket_launch,
+        Icons.castle,
+        Icons.shield,
+        Icons.auto_awesome,
+        Icons.cruelty_free,
+        Icons.psychology,
+        Icons.military_tech,
+        Icons.explore,
+        Icons.sailing,
+        Icons.brightness_7,
+        Icons.flight_takeoff,
+        Icons.sports_esports,
+        Icons.smart_toy,
+        Icons.cyclone,
+        Icons.public,
+        Icons.flare,
+        Icons.diamond,
+        Icons.bolt,
+      ];
+    }
+
     return [
       Icons.star,
       Icons.favorite,
@@ -216,7 +244,7 @@ class _MemoryCardsGameScreenState extends State<MemoryCardsGameScreen> {
     // Actually, explicit achievement check is best done after saving game progress.
 
     // Unlock next level (Non-destructive)
-    if (widget.level < 10) {
+    if (widget.level < 20) {
       final nextLevelNum = widget.level + 1;
       var nextLevelProgress = progress.levels[nextLevelNum];
 
@@ -264,7 +292,9 @@ class _MemoryCardsGameScreenState extends State<MemoryCardsGameScreen> {
   @override
   Widget build(BuildContext context) {
     int crossAxisCount = 3;
-    if (_cards.length >= 20) {
+    if (_cards.length >= 28) {
+      crossAxisCount = 6;
+    } else if (_cards.length >= 20) {
       crossAxisCount = 5;
     } else if (_cards.length >= 16) {
       crossAxisCount = 4;

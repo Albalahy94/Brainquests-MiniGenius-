@@ -1,7 +1,7 @@
 name: minigenius
 description: A fun, safe, and educational mobile app that enhances children's cognitive abilities through mini-games.
 publish_to: 'none'
-version: 2.0.0+3
+version: 2.0.1+4
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:minigenius/generated/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +11,7 @@ import '../../../core/widgets/glassmorphic_container.dart';
 import '../widgets/game_card.dart';
 import '../widgets/bottom_navigation.dart';
 import '../widgets/animated_background.dart';
+import '../../../core/widgets/parental_gate_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -65,19 +66,64 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
                     children: [
-                      Text(
-                        l10n.appTitle,
-                        style: theme.textTheme.displayLarge?.copyWith(
-                              color: Colors.white,
-                              fontSize: 42,
-                              shadows: [
-                                Shadow(
-                                  offset: const Offset(2, 4),
-                                  blurRadius: 8,
-                                  color: Colors.black.withOpacity(0.3),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l10n.appTitle,
+                            style: theme.textTheme.displayLarge?.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 38,
+                                  shadows: [
+                                    Shadow(
+                                      offset: const Offset(2, 4),
+                                      blurRadius: 8,
+                                      color: Colors.black.withOpacity(0.3),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () async {
+                              final passed = await showParentalGateDialog(context);
+                              if (passed && context.mounted) {
+                                Navigator.pushNamed(context, AppRoutes.premium);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFFD54F), Color(0xFFFF8F00)],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.amber.withOpacity(0.4),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.workspace_premium, color: Color(0xFF2E1500), size: 14),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    'PRO',
+                                    style: TextStyle(
+                                      color: Color(0xFF2E1500),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                          ),
+                        ],
                       ).animate().fadeIn(duration: 600.ms).slideY(begin: -0.2, end: 0),
                       const SizedBox(height: 24),
                       // Quick Action Buttons
