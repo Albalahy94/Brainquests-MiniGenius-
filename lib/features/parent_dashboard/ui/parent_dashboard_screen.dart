@@ -14,6 +14,8 @@ import '../../../core/models/game_info.dart';
 import '../../../core/services/vip_service.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/widgets/parental_gate_dialog.dart';
+import '../../../core/services/licensing_api_service.dart';
+import 'parent_account_dialog.dart';
 import 'dart:math';
 
 class ParentDashboardScreen extends StatefulWidget {
@@ -29,6 +31,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   ParentSettings? _settings;
   ChildProgressReport? _report;
   bool _isAuthenticated = false;
+  Map<String, String?> _parentProfile = {};
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -39,9 +42,11 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
 
   Future<void> _loadData() async {
     await _storageService.init();
+    final profile = await LicensingApiService().getParentProfile();
     setState(() {
       _settings = _parentService.getSettings();
       _report = _parentService.generateReport();
+      _parentProfile = profile;
     });
   }
 
@@ -292,6 +297,13 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       ),
                     ),
                     IconButton(
+                      icon: const Icon(Icons.account_circle, color: Colors.white, size: 28),
+                      tooltip: 'حساب ولي الأمر',
+                      onPressed: () {
+                        ParentAccountDialog.show(context, onAccountUpdated: _loadData);
+                      },
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.lock, color: Colors.white),
                       onPressed: () {
                         setState(() {
@@ -310,6 +322,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Parent Account Banner
+                      _buildParentAccountBanner(),
+                      const SizedBox(height: 16),
+
                       // Today's Play Time
                       _StatCard(
                         title: 'وقت اللعب اليوم',
@@ -680,6 +696,86 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildParentAccountBanner() {
+    final isLoggedIn = _parentProfile['isLoggedIn'] == 'true';
+    final name = _parentProfile['name'] ?? 'ولي الأمر';
+    final phone = _parentProfile['phone'] ?? '';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isLoggedIn ? Colors.teal : AppTheme.primaryBlue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            ),
+            onPressed: () {
+              ParentAccountDialog.show(context, onAccountUpdated: _loadData);
+            },
+            child: Text(
+              isLoggedIn ? 'إدارة الحساب' : 'تسجيل حساب',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      isLoggedIn ? name : 'حساب ولي الأمر',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Icon(
+                      isLoggedIn ? Icons.verified_user_rounded : Icons.person_add_alt_1_rounded,
+                      color: isLoggedIn ? Colors.teal : AppTheme.primaryBlue,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isLoggedIn
+                      ? (phone.isNotEmpty ? 'الواتساب: $phone • متصل بالبورتال' : 'الحساب متصل بالبورتال المركزي')
+                      : 'سجّل حسابك لحفظ تقدم واشتراكات طفلك',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

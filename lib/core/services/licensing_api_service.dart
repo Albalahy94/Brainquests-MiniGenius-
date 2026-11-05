@@ -15,6 +15,11 @@ class LicensingApiService {
   static const String _deviceIdKey = 'brainquests_licensing_device_id';
   static const String _licensePlanKey = 'brainquests_license_plan';
   static const String _licenseExpiresKey = 'brainquests_license_expires_at';
+  static const String _parentNameKey = 'parent_account_name';
+  static const String _parentPhoneKey = 'parent_account_phone';
+  static const String _parentEmailKey = 'parent_account_email';
+  static const String _parentTokenKey = 'parent_auth_token';
+  static const String _parentUserIdKey = 'parent_user_id';
 
   /// Production server URL on Albalahy Cloud
   static String baseUrl = 'https://albalahy4u.cloud/api/v1';
@@ -150,6 +155,197 @@ class LicensingApiService {
         'message': 'تعذر الاتصال بسيرفر التراخيص. يرجى التحقق من اتصال الإنترنت.',
       };
     }
+  }
+
+  /// Get stored parent profile
+  Future<Map<String, String?>> getParentProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString(_parentNameKey);
+    final phone = prefs.getString(_parentPhoneKey);
+    final email = prefs.getString(_parentEmailKey);
+    final token = prefs.getString(_parentTokenKey);
+    final isLoggedIn = (name != null && name.isNotEmpty);
+    return {
+      'name': name,
+      'phone': phone,
+      'email': email,
+      'token': token,
+      'isLoggedIn': isLoggedIn ? 'true' : 'false',
+    };
+  }
+
+  /// Register parent account on Albalahy Portal
+  Future<Map<String, dynamic>> registerParentAccount({
+    required String name,
+    required String phone,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final uri = Uri.parse('https://albalahy4u.cloud/api/admin/auth.php?action=register');
+      final client = HttpClient()..connectionTimeout = const Duration(seconds: 12);
+      final request = await client.postUrl(uri);
+      request.headers.set('Content-Type', 'application/json; charset=UTF-8');
+
+      final body = jsonEncode({
+        'name': name.trim(),
+        'phone': phone.trim(),
+        'email': email.trim().toLowerCase(),
+        'password': password,
+      });
+      request.write(body);
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+      client.close();
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 201 || data['status'] == 'success') {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_parentNameKey, name.trim());
+        await prefs.setString(_parentPhoneKey, phone.trim());
+        await prefs.setString(_parentEmailKey, email.trim().toLowerCase());
+        if (data['token'] != null) {
+          await prefs.setString(_parentTokenKey, data['token'].toString());
+        }
+        if (data['user']?['id'] != null) {
+          await prefs.setString(_parentUserIdKey, data['user']['id'].toString());
+        }
+        // Sync license after register
+        await verifyLicense();
+        return {
+          'status': 'success',
+          'message': data['message'] ?? 'تم إنشاء حساب ولي الأمر بنجاح!',
+        };
+      } else {
+        return {
+          'status': 'error',
+          'message': data['message'] ?? 'تعذر إنشاء الحساب، يرجى المحاولة مرة أخرى.',
+        };
+      }
+    } catch (e) {
+      return {'status': 'error', 'message': 'خطأ في الاتصال بالخادم: $e'};
+    }
+  }
+
+  /// Login parent account
+  Future<Map<String, dynamic>> loginParentAccount({
+    required String identifier,
+    required String password,
+  }) async {
+    try {
+      final uri = Uri.parse('https://albalahy4u.cloud/api/admin/auth.php?action=login');
+      final client = HttpClient()..connectionTimeout = const Duration(seconds: 12);
+      final request = await client.postUrl(uri);
+      request.headers.set('Content-Type', 'application/json; charset=UTF-8');
+
+      final body = jsonEncode({
+        'email': identifier.trim(),
+        'password': password,
+      });
+      request.write(body);
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+      client.close();
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        final userData = data['user'] as Map<String, dynamic>?;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_parentNameKey, userData?['name'] ?? identifier);
+        await prefs.setString(_parentPhoneKey, userData?['phone'] ?? '');
+        await prefs.setString(_parentEmailKey, userData?['email'] ?? identifier);
+        if (data['token'] != null) {
+          await prefs.setString(_parentTokenKey, data['token'].toString());
+        }
+        if (userData?['id'] != null) {
+          await prefs.setString(_parentUserIdKey, userData!['id'].toString());
+        }
+        // Sync license after login
+        await verifyLicense();
+        return {
+          'status': 'success',
+          'message': data['message'] ?? 'تم تسجيل الدخول بنجاح!',
+        };
+      } else {
+        return {
+          'status': 'error',
+          'message': data['message'] ?? 'بيانات الدخول غير صحيحة.',
+        };
+      }
+    } catch (e) {
+      return {'status': 'error', 'message': 'تعذر الاتصال بالخادم: $e'};
+    }
+  }
+
+  /// Submit an urgent direct subscription request to the Portal
+  Future<Map<String, dynamic>> submitSubscriptionRequest({
+    required String planId,
+    required String planName,
+    required String price,
+    required String parentName,
+    required String parentPhone,
+    String? parentEmail,
+  }) async {
+    try {
+      final deviceId = await getDeviceId();
+      final uri = Uri.parse('https://albalahy4u.cloud/api/tickets.php');
+      final client = HttpClient()..connectionTimeout = const Duration(seconds: 12);
+      final request = await client.postUrl(uri);
+      request.headers.set('Content-Type', 'application/json; charset=UTF-8');
+
+      final body = jsonEncode({
+        'name': parentName.trim(),
+        'phone': parentPhone.trim(),
+        'email': (parentEmail != null && parentEmail.isNotEmpty)
+            ? parentEmail.trim().toLowerCase()
+            : '$parentPhone@brainquests.client',
+        'app_slug': 'brainquests',
+        'subject': 'طلب تفعيل اشتراك VIP - باقة $planName ($price)',
+        'message': 'طلب اشتراك جديد من تطبيق Brainquests للأطفال.\n'
+            '• اسم ولي الأمر: $parentName\n'
+            '• رقم الواتساب: $parentPhone\n'
+            '• الباقة المطلوبة: $planName ($price)\n'
+            '• معرف الجهاز (Device ID): $deviceId\n'
+            'يرجى التواصل عبر الواتساب لتأكيد الاستلام وتفعيل الاشتراك.',
+        'priority': 'urgent',
+      });
+      request.write(body);
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+      client.close();
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 || response.statusCode == 201 || data['status'] == 'success') {
+        return {
+          'status': 'success',
+          'message': 'تم إرسال طلبك بنجاح! سيتم التواصل معك عبر الواتساب لتأكيد التفعيل فوراً.',
+          'ticket': data['data'] ?? data['ticket'],
+        };
+      } else {
+        return {
+          'status': 'error',
+          'message': data['message'] ?? 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': 'error',
+        'message': 'تعذر إرسال الطلب. يرجى التأكد من اتصال الإنترنت أو التواصل المباشر عبر الواتساب.',
+      };
+    }
+  }
+
+  /// Sign out parent account
+  Future<void> logoutParentAccount() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_parentNameKey);
+    await prefs.remove(_parentPhoneKey);
+    await prefs.remove(_parentEmailKey);
+    await prefs.remove(_parentTokenKey);
+    await prefs.remove(_parentUserIdKey);
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:minigenius/core/widgets/parental_gate_dialog.dart';
 import 'package:minigenius/core/widgets/redeem_code_dialog.dart';
+import '../../parent_dashboard/ui/parent_account_dialog.dart';
 import 'package:minigenius/generated/l10n/app_localizations.dart';
 import 'package:minigenius/core/theme/app_theme.dart';
 import 'package:minigenius/core/providers/app_state_provider.dart';
@@ -47,6 +48,18 @@ class SettingsScreen extends StatelessWidget {
               final isParent = await showParentalGateDialog(context);
               if (isParent && context.mounted) {
                 await showRedeemCodeDialog(context);
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.account_circle_outlined, color: Colors.teal, size: 26),
+            title: const Text('حساب ولي الأمر (Parent Account)', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('ربط الهاتف بالبورتال، حفظ الاشتراكات، ومزامنة VIP'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () async {
+              final isParent = await showParentalGateDialog(context);
+              if (isParent && context.mounted) {
+                await ParentAccountDialog.show(context);
               }
             },
           ),

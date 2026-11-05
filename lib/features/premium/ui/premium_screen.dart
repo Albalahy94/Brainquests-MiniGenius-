@@ -4,6 +4,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/services/iap_service.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/widgets/redeem_code_dialog.dart';
+import '../../../core/widgets/direct_subscription_dialog.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -279,6 +280,53 @@ class _PremiumScreenState extends State<PremiumScreen> {
                               Text(
                                 isAr ? 'تفعيل الكود' : 'Redeem',
                                 style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Direct Subscription Request Banner
+                      InkWell(
+                        onTap: () {
+                          DirectSubscriptionDialog.show(
+                            context,
+                            initialPlanId: _selectedPlanIndex == 0
+                                ? 'yearly'
+                                : (_selectedPlanIndex == 1 ? 'monthly' : 'lifetime'),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.teal.shade700.withOpacity(0.4),
+                                Colors.teal.shade900.withOpacity(0.3),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.tealAccent.withOpacity(0.4)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.flash_on_rounded, color: Colors.tealAccent, size: 22),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  isAr
+                                      ? 'دفع محلي عبر إنستاباي أو فودافون كاش؟'
+                                      : 'Local payment via InstaPay / Vodafone Cash?',
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              Text(
+                                isAr ? 'طلب اشتراك مباشر' : 'Direct Request',
+                                style: const TextStyle(
+                                    color: Colors.tealAccent, fontWeight: FontWeight.bold, fontSize: 13),
                               ),
                             ],
                           ),
