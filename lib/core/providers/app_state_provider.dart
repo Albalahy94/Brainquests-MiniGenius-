@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
+import '../services/licensing_api_service.dart';
 import '../models/user_progress.dart';
 import '../models/game_progress.dart';
 
@@ -34,6 +35,20 @@ class AppStateProvider extends ChangeNotifier {
       
       notifyListeners();
       debugPrint('✅ AppStateProvider initialized successfully');
+
+      // Verify central device license status on app launch (non-blocking)
+      LicensingApiService().verifyLicense().then((res) {
+        final subData = res['data'] as Map<String, dynamic>?;
+        if (subData != null &&
+            (subData['is_pro'] == true ||
+                subData['plan'] == 'pro' ||
+                subData['plan'] == 'ultimate')) {
+          _userProgress = _storageService.getUserProgress();
+          notifyListeners();
+        }
+      }).catchError((e) {
+        debugPrint('⚠️ Central license check on launch skipped: $e');
+      });
     } catch (e, stackTrace) {
       debugPrint('❌ Error initializing AppStateProvider: $e');
       debugPrint('Stack: $stackTrace');

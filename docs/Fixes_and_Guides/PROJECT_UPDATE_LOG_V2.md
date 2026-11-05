@@ -148,4 +148,26 @@
 3. **تقديم نسخة iOS للمراجعة النهائية:**
    * بعد التأكد من تجربة TestFlight الداخلية، تقديم النسخة 2.0.1 لمراجعة أبل الرسمية في App Store.
 
+---
+
+## [تحديث تاريخ اليوم: 2026-11-05] - ربط البورتال الحي Albalahy Cloud، فحص التراخيص عند الفتح، وتحويل الأكشن إلى يدوي (Manual Dispatch)
+
+### 🎯 ملخص إنجازات وتحديثات اليوم:
+1. **تحديث عنوان السيرفر الحي المعتمد (Live Production API):**
+   * تم توجيه `LicensingApiService.baseUrl` إلى الرابط الرسمي المباشر:
+     `https://albalahy4u.cloud/api/v1`
+   * تم تحديث حمولة الطلبات (Request Payload) لتشمل `app_key` داخل الـ JSON Body بجانب الـ Header `X-App-Key` لضمان التوافق التام مع البورتال المحدث.
+
+2. **تفعيل الفحص التلقائي للتراخيص عند بدء تشغيل التطبيق (Automatic Background License Verification):**
+   * تم ربط استدعاء `verifyLicense()` بشكل تلقائي وغير معطل (non-blocking) داخل `AppStateProvider.initialize()`.
+   * بمجرد فتح التطبيق، يتم إرسال `device_id` و `app_key` لفحص حالة الجهاز، وفي حال وجود اشتراك VIP مفعل أو ترقية من لوحة التحكم، يتم تحديث واجهة المستخدم فوراً وإلغاء أقفال المستويات بدون أي تدخل يدوي من الطفل.
+
+3. **حماية باقة GitHub Actions وجعل البناء يدوياً حصراً (Manual Workflow Dispatch Only):**
+   * تم تعديل ملف `.github/workflows/ios-release.yml` وحذف المشغل التلقائي `on: push`.
+   * أصبحت الـ Action تعمل فقط عبر **`workflow_dispatch`** (يدوياً من زر Run workflow في تبويب Actions) لمنع استهلاك دقائق الماك (macOS Runner Minutes) مع كل push وتوفير باقة الحساب بالكامل.
+
+4. **الفحص والتحقق البرمجي (Dart Analysis):**
+   * تم تشغيل `dart analyze` والتأكد من خلو المشروع تماماً من أي أخطاء برمجية (`0 Errors`).
+
+
 

@@ -16,9 +16,8 @@ class LicensingApiService {
   static const String _licensePlanKey = 'brainquests_license_plan';
   static const String _licenseExpiresKey = 'brainquests_license_expires_at';
 
-  /// Production server URL (can be customized via remote config or environment)
-  /// For local server development: 'http://10.0.2.2:8080/backend/api/v1' or 'http://localhost:8080/backend/api/v1'
-  static String baseUrl = 'https://portal.albalahy4u.com/licensing_hub/backend/api/v1';
+  /// Production server URL on Albalahy Cloud
+  static String baseUrl = 'https://albalahy4u.cloud/api/v1';
 
   final StorageService _storageService = StorageService();
 
@@ -46,7 +45,10 @@ class LicensingApiService {
       request.headers.set('Content-Type', 'application/json; charset=UTF-8');
       request.headers.set('X-App-Key', kAppKey);
 
-      final body = jsonEncode({'device_id': deviceId});
+      final body = jsonEncode({
+        'app_key': kAppKey,
+        'device_id': deviceId,
+      });
       request.write(body);
 
       final response = await request.close();
@@ -104,6 +106,7 @@ class LicensingApiService {
       request.headers.set('X-App-Key', kAppKey);
 
       final body = jsonEncode({
+        'app_key': kAppKey,
         'device_id': deviceId,
         'code': code.trim().toUpperCase(),
         if (email != null && email.isNotEmpty) 'email': email.trim(),

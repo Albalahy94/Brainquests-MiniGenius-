@@ -1,13 +1,6 @@
 name: iOS Release Build
 
 on:
-  push:
-    branches: [ master ]
-    paths:
-      - 'lib/**'
-      - 'pubspec.yaml'
-      - 'ios/**'
-      - '.github/workflows/ios-release.yml'
   workflow_dispatch:
     inputs:
       upload_to_testflight:
