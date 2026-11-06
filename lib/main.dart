@@ -15,6 +15,7 @@ import 'package:minigenius/core/models/currency.dart';
 import 'package:minigenius/core/models/parent_dashboard.dart';
 import 'package:minigenius/features/worlds/ui/world_levels_screen.dart';
 import 'package:minigenius/core/services/screen_time_service.dart';
+import 'package:minigenius/core/services/iap_service.dart';
 import 'package:minigenius/core/widgets/screen_time_watcher.dart';
 
 void main() async {
@@ -55,6 +56,9 @@ void main() async {
 
   // Initialize Screen Time and Child Profiles
   await ScreenTimeService().initialize();
+
+  // Initialize In-App Purchases (Apple StoreKit & Google Play billing)
+  await IAPService().initialize();
 
   runApp(
     ChangeNotifierProvider.value(

@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
@@ -8,6 +10,7 @@ import '../../../core/services/licensing_api_service.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/widgets/redeem_code_dialog.dart';
 import '../../../core/widgets/direct_subscription_dialog.dart';
+import '../../../core/widgets/parental_gate_dialog.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -30,8 +33,21 @@ class _PremiumScreenState extends State<PremiumScreen> {
   Future<void> _handlePurchase() async {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
-    // If store products are empty or IAP is not available, open the direct subscription dialog
+    // If store products are empty or IAP is not available
     if (!_iapService.isAvailable || _iapService.products.isEmpty) {
+      if (!kIsWeb && Platform.isIOS) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isAr
+                  ? 'جاري تحميل باقات الاشتراك من متجر App Store، يرجى المحاولة بعد قليل.'
+                  : 'Loading subscription plans from the App Store. Please try again shortly.'),
+              backgroundColor: Colors.amber.shade800,
+            ),
+          );
+        }
+        return;
+      }
       final planId = _selectedPlanIndex == 0
           ? 'yearly'
           : (_selectedPlanIndex == 1 ? 'monthly' : 'lifetime');
@@ -333,52 +349,57 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Direct Subscription Request Banner
-                      InkWell(
-                        onTap: () {
-                          DirectSubscriptionDialog.show(
-                            context,
-                            initialPlanId: _selectedPlanIndex == 0
-                                ? 'yearly'
-                                : (_selectedPlanIndex == 1 ? 'monthly' : 'lifetime'),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.teal.shade700.withOpacity(0.4),
-                                Colors.teal.shade900.withOpacity(0.3),
+                      // Direct Subscription Request Banner (Only show on Android / Web - prohibited by Apple on iOS Guideline 3.1.1)
+                      if (kIsWeb || !Platform.isIOS) ...[
+                        InkWell(
+                          onTap: () {
+                            DirectSubscriptionDialog.show(
+                              context,
+                              initialPlanId: _selectedPlanIndex == 0
+                                  ? 'yearly'
+                                  : (_selectedPlanIndex == 1 ? 'monthly' : 'lifetime'),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.teal.shade700.withOpacity(0.4),
+                                  Colors.teal.shade900.withOpacity(0.3),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.tealAccent.withOpacity(0.4)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.flash_on_rounded, color: Colors.tealAccent, size: 22),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    isAr
+                                        ? 'دفع محلي عبر إنستاباي أو فودافون كاش؟'
+                                        : 'Local payment via InstaPay / Vodafone Cash?',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  isAr ? 'طلب اشتراك مباشر' : 'Direct Request',
+                                  style: const TextStyle(
+                                      color: Colors.tealAccent, fontWeight: FontWeight.bold, fontSize: 13),
+                                ),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.tealAccent.withOpacity(0.4)),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.flash_on_rounded, color: Colors.tealAccent, size: 22),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  isAr
-                                      ? 'دفع محلي عبر إنستاباي أو فودافون كاش؟'
-                                      : 'Local payment via InstaPay / Vodafone Cash?',
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                              Text(
-                                isAr ? 'طلب اشتراك مباشر' : 'Direct Request',
-                                style: const TextStyle(
-                                    color: Colors.tealAccent, fontWeight: FontWeight.bold, fontSize: 13),
-                              ),
-                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                      ] else ...[
+                        const SizedBox(height: 12),
+                      ],
 
                       // Features List
                       Container(
@@ -470,6 +491,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             const Text(' • ', style: TextStyle(color: Colors.white38)),
                             TextButton(
                               onPressed: () async {
+                                final isParent = await showParentalGateDialog(context);
+                                if (!isParent) return;
                                 final Uri eulaUri = Uri.parse(
                                   'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
                                 );

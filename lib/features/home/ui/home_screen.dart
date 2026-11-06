@@ -7,6 +7,7 @@ import 'package:minigenius/core/routes/app_routes.dart';
 import 'package:minigenius/core/services/parent_dashboard_service.dart';
 import 'package:minigenius/core/providers/app_state_provider.dart';
 import '../../../core/widgets/glassmorphic_container.dart';
+import '../../../core/widgets/parental_gate_dialog.dart';
 import '../widgets/game_card.dart';
 import '../widgets/bottom_navigation.dart';
 import '../widgets/animated_background.dart';
@@ -86,8 +87,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(width: 8),
                             GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, AppRoutes.premium);
+                              onTap: () async {
+                                final isParent = await showParentalGateDialog(context);
+                                if (isParent && context.mounted) {
+                                  Navigator.pushNamed(context, AppRoutes.premium);
+                                }
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
