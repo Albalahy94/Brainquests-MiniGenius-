@@ -131,15 +131,18 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
                 color: theme.colorScheme.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                '$_num1 × $_num2 = ?',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                  letterSpacing: 2,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '$_num1 × $_num2 = ?',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                    letterSpacing: 2,
+                  ),
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.ltr,
                 ),
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.ltr,
               ),
             ),
 
@@ -173,9 +176,12 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
                 children: [
                   const Icon(Icons.close_rounded, color: Colors.red, size: 18),
                   const SizedBox(width: 6),
-                  Text(
-                    wrongText,
-                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                  Flexible(
+                    child: Text(
+                      wrongText,
+                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 13),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),
