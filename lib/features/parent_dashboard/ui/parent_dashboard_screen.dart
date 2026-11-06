@@ -90,32 +90,34 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     }
   }
 
-  void _setupPassword() {
+  void _setupPassword([bool isAr = true]) {
     final passwordController = TextEditingController();
     final confirmController = TextEditingController();
     
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('إعداد كلمة المرور'),
+        title: Text(isAr ? 'إعداد كلمة المرور' : 'Set Parent Password'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'كلمة المرور',
-                hintText: 'أدخل كلمة مرور قوية',
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: isAr ? 'كلمة المرور' : 'Password',
+                hintText: isAr ? 'أدخل كلمة المرور' : 'Enter password',
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: confirmController,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'تأكيد كلمة المرور',
-                hintText: 'أعد إدخال كلمة المرور',
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: isAr ? 'تأكيد كلمة المرور' : 'Confirm Password',
+                hintText: isAr ? 'أعد إدخال كلمة المرور' : 'Re-enter password',
               ),
             ),
           ],
@@ -123,21 +125,21 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: Text(isAr ? 'إلغاء' : 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
               if (passwordController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('يرجى إدخال كلمة المرور')),
+                  SnackBar(content: Text(isAr ? 'يرجى إدخال كلمة المرور' : 'Please enter password')),
                 );
                 return;
               }
-              
+
               if (passwordController.text != confirmController.text) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('كلمات المرور غير متطابقة'),
+                  SnackBar(
+                    content: Text(isAr ? 'كلمات المرور غير متطابقة' : 'Passwords do not match'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -146,8 +148,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
 
               if (passwordController.text.length < 4) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('كلمة المرور يجب أن تكون 4 أحرف على الأقل'),
+                  SnackBar(
+                    content: Text(isAr ? 'كلمة المرور يجب أن تكون 4 أحرف على الأقل' : 'Password must be at least 4 digits'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -157,14 +159,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               await _parentService.setPassword(passwordController.text);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم إعداد كلمة المرور بنجاح'),
+                SnackBar(
+                  content: Text(isAr ? 'تم إعداد كلمة المرور بنجاح' : 'Password configured successfully'),
                   backgroundColor: Colors.green,
                 ),
               );
               _loadData();
             },
-            child: const Text('حفظ'),
+            child: Text(isAr ? 'حفظ' : 'Save'),
           ),
         ],
       ),
@@ -303,7 +305,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
-                                    children: [
+                  children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
@@ -338,6 +340,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       },
                     ),
                   ],
+                ),
               ),
 
               // Content
