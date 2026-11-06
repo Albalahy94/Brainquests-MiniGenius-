@@ -4,6 +4,21 @@ All notable changes to the **Brainquests (Mini Genius)** project will be documen
 
 ---
 
+## [2.0.2+5] - 2026-11-06
+
+### Added
+- **Full Bilingual Support in Parent Dashboard**: Arabic and English translation across all dashboard panels, PIN dialogues, children profiles, game management, and playtime limit settings.
+- **Precision Playtime Tracking**: Live duration measurement down to the second in `ParentDashboardService`, accurately accumulating playtime across brief sessions and showing friendly formatting (`45 ثانية` / `1 د و 15 ث`).
+- **Comprehensive Parental Gate on Upgrades**: Enforced Apple Guideline 1.3 math challenge (`showParentalGateDialog`) on the Settings screen upgrade and subscription tile.
+- **Continuous Project Tracking File**: Added `PROJECT_LOG.md` as the live repository log for real-time progress, daily updates, and architectural roadmap.
+
+### Fixed
+- **RenderFlex Overflows**: Eliminated all layout overflows in Parent Dashboard (parent header banner, child cards, statistics metrics, and support cards).
+- **Parent Dashboard Syntax & Dialog Arguments**: Corrected missing layout parenthesis and added bilingual parameter support to `_setupPassword([bool isAr = true])`.
+- **Google Play Release Bundle**: Successfully built signed production `.aab` for version 2.0.2+5.
+
+---
+
 ## [2.0.1+4] - 2026-11-01
 
 ### Added
