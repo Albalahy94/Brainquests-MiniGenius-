@@ -70,6 +70,13 @@ flutter {
     source = "../.."
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.android.billingclient:billing:8.0.0")
+    }
+}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation("com.android.billingclient:billing:8.0.0")
 }

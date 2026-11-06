@@ -8,10 +8,11 @@
 
 * **اسم التطبيق:** Brainquests (Mini Genius - عباقرة صغار)
 * **معرف الحزمة (Package ID):** `octukheir.minigenius.app`
-* **الإصدار الحالي (Current Version):** `2.0.2+5`
+* **الإصدار الحالي (Current Version):** `2.0.3+6`
 * **الفرع النشط (Git Branch):** `master` (مُزامن مع المستودع السحابي `origin/master`)
 * **ملف الإنتاج الحالي لمتجر جوجل بلاي:**
-  `build\app\outputs\bundle\release\app-release.aab` (بحجم ~58.3 ميجابايت، موقع ومبني بنجاح بتاريخ 2026-11-06).
+  `build\app\outputs\bundle\release\app-release.aab` (بحجم ~58.3 ميجابايت، متوافق مع Play Billing Library 8.0.0 ومبني بنجاح بتاريخ 2026-11-06).
+* **مكتبة المشتريات والاشتراكات المعتمدة:** `Google Play Billing Library 8.0.0` (إلزامية جوجل بلاي لحل الخطأ المانع للإصدار 5).
 * **حالة الاختبارات والتحليل (Dart Analyze):** خالي تماماً من الأخطاء (0 Compilation / Type Errors).
 
 ---
@@ -45,6 +46,20 @@
 ---
 
 ## 📅 سجل التحديثات اليومية المفصل (Daily Execution Log)
+
+---
+
+### [2026-11-06 - جلسة الليل المتأخرة] - ترقية مكتبة Google Play Billing إلى 8.0.0 وإصدار الحزمة 2.0.3+6
+
+#### 🎯 الأهداف المنفذة:
+1. **حل الخطأ المانع على Google Play Console لرمز الإصدار 5**:
+   - اشترط جوجل بلاي إلزامياً استخدام مكتبة Play Billing 8.0.0 على الأقل لحسابات وأحدث معايير المتاجر، مما حظر تسليم رمز الإصدار 5.
+   - ترقية `in_app_purchase_android` إلى `0.5.0` المبنية رسمياً على `com.android.billingclient:billing:8.0.0`.
+   - إجبار إصدار المكتبة الصريح في `android/app/build.gradle.kts` عبر `resolutionStrategy.force("com.android.billingclient:billing:8.0.0")`.
+2. **ترقية رمز الإصدار وتوليد الحزمة النهائية**:
+   - ترقية الإصدار إلى `2.0.3+6` في `pubspec.yaml`.
+   - بناء ملف الإنتاج النهائي بنجاح: `build\app\outputs\bundle\release\app-release.aab` (58.3MB).
+   - توثيق الإجراء وتحديث مصفوفة الخطة والـ Git.
 
 ---
 
@@ -103,3 +118,4 @@
 3. **قواعد الـ Git والنشر المستمر (CI/CD):**
    - ضبط ملفات GitHub Actions لتكون `workflow_dispatch` فقط حتى لا تُستهلك موارد السيرفرات عند كل push تلقائي.
    - توثيق كل خطوة جديدة أولاً بأول وتحديث `PROJECT_LOG.md` بتاريخ اليوم مع كل تغيير.
+

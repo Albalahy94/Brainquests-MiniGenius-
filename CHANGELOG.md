@@ -4,6 +4,13 @@ All notable changes to the **Brainquests (Mini Genius)** project will be documen
 
 ---
 
+## [2.0.3+6] - 2026-11-06
+
+### Fixed
+- **Google Play Billing Library Upgrade (8.0.0)**: Upgraded `in_app_purchase_android` to `0.5.0` and explicitly forced `com.android.billingclient:billing:8.0.0` in `android/app/build.gradle.kts` to satisfy Google Play's mandatory Billing Library 8+ requirement and resolve release rejection.
+
+---
+
 ## [2.0.2+5] - 2026-11-06
 
 ### Added
