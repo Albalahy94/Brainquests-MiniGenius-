@@ -67,10 +67,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     });
   }
 
-  void _authenticate() {
+  void _authenticate(bool isAr) {
     if (_passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال كلمة المرور')),
+        SnackBar(content: Text(isAr ? 'يرجى إدخال كلمة المرور' : 'Please enter parent password')),
       );
       return;
     }
@@ -82,8 +82,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       _passwordController.clear();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('كلمة المرور غير صحيحة'),
+        SnackBar(
+          content: Text(isAr ? 'كلمة المرور غير صحيحة' : 'Incorrect password'),
           backgroundColor: Colors.red,
         ),
       );
@@ -171,7 +171,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  void _changePassword() {
+  void _changePassword(bool isAr) {
     final oldPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
     final confirmController = TextEditingController();
@@ -179,7 +179,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تغيير كلمة المرور'),
+        title: Text(isAr ? 'تغيير كلمة المرور' : 'Change Password'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -187,24 +187,27 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               TextField(
                 controller: oldPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'كلمة المرور القديمة',
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: isAr ? 'كلمة المرور القديمة' : 'Old Password',
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: newPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'كلمة المرور الجديدة',
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: isAr ? 'كلمة المرور الجديدة' : 'New Password',
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: confirmController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'تأكيد كلمة المرور الجديدة',
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: isAr ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password',
                 ),
               ),
             ],
@@ -213,7 +216,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: Text(isAr ? 'إلغاء' : 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -221,15 +224,15 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   newPasswordController.text.isEmpty ||
                   confirmController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('يرجى ملء جميع الحقول')),
+                  SnackBar(content: Text(isAr ? 'يرجى ملء جميع الحقول' : 'Please fill all fields')),
                 );
                 return;
               }
 
               if (newPasswordController.text != confirmController.text) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('كلمات المرور الجديدة غير متطابقة'),
+                  SnackBar(
+                    content: Text(isAr ? 'كلمات المرور الجديدة غير متطابقة' : 'New passwords do not match'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -238,8 +241,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
 
               if (newPasswordController.text.length < 4) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('كلمة المرور يجب أن تكون 4 أحرف على الأقل'),
+                  SnackBar(
+                    content: Text(isAr ? 'كلمة المرور يجب أن تكون 4 أحرف على الأقل' : 'Password must be at least 4 digits'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -253,8 +256,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 );
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('تم تغيير كلمة المرور بنجاح'),
+                  SnackBar(
+                    content: Text(isAr ? 'تم تغيير كلمة المرور بنجاح' : 'Password changed successfully'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -267,7 +270,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 );
               }
             },
-            child: const Text('حفظ'),
+            child: Text(isAr ? 'حفظ' : 'Save'),
           ),
         ],
       ),
@@ -282,8 +285,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       );
     }
 
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
     if (!_isAuthenticated) {
-      return _buildPasswordScreen();
+      return _buildPasswordScreen(isAr);
     }
 
     return Scaffold(
@@ -298,7 +303,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
-                  children: [
+                                    children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
@@ -307,7 +312,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          'لوحة تحكم الوالدين',
+                          isAr ? 'لوحة تحكم الوالدين' : 'Parent Dashboard',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                                 color: Colors.white,
@@ -318,13 +323,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.account_circle, color: Colors.white, size: 28),
-                      tooltip: 'حساب ولي الأمر',
+                      tooltip: isAr ? 'حساب ولي الأمر' : 'Parent Account',
                       onPressed: () {
                         ParentAccountDialog.show(context, onAccountUpdated: _loadData);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.lock, color: Colors.white),
+                      tooltip: isAr ? 'قفل' : 'Lock',
                       onPressed: () {
                         setState(() {
                           _isAuthenticated = false;
@@ -332,7 +338,6 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       },
                     ),
                   ],
-                ),
               ),
 
               // Content
@@ -343,24 +348,51 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Parent Account Banner
-                      _buildParentAccountBanner(),
+                      _buildParentAccountBanner(isAr),
                       const SizedBox(height: 16),
 
                       // Children Profiles & Screen Time Management Section
-                      _buildChildrenProfilesSection(),
+                      _buildChildrenProfilesSection(isAr),
                       const SizedBox(height: 16),
 
-                      // Today's Play Time for Active Child
-                      _StatCard(
-                        title: 'وقت لعب (${ScreenTimeService().activeChild.name}) اليوم',
-                        value: '${(ScreenTimeService().activeChild.secondsUsedToday / 60).floor()} دقيقة',
-                        icon: Icons.access_time,
-                        color: Colors.blue,
-                        subtitle: ScreenTimeService().activeChild.isScreenTimeEnabled &&
-                                ScreenTimeService().activeChild.dailyLimitMinutes > 0
-                            ? 'المحدد: ${ScreenTimeService().activeChild.dailyLimitMinutes} دقيقة (المتبقي: ${ScreenTimeService().activeChild.remainingMinutes >= 0 ? "${ScreenTimeService().activeChild.remainingMinutes} دقيقة" : "مفتوح"})'
-                            : 'لا يوجد حد زمني (مفتوح)',
-                      ),
+                      // Today's Play Time for Active Child (Live Seconds & Minutes)
+                      Builder(builder: (context) {
+                        final child = ScreenTimeService().activeChild;
+                        final usedSecs = child.secondsUsedToday;
+                        final usedMins = (usedSecs / 60).floor();
+                        final remainingMins = child.remainingMinutes;
+
+                        String playTimeValue;
+                        if (usedSecs < 60) {
+                          playTimeValue = isAr ? '$usedSecs ثانية' : '$usedSecs sec';
+                        } else {
+                          final remSec = usedSecs % 60;
+                          if (remSec == 0) {
+                            playTimeValue = isAr ? '$usedMins دقيقة' : '$usedMins min';
+                          } else {
+                            playTimeValue = isAr ? '$usedMins د و $remSec ث' : '$usedMins m $remSec s';
+                          }
+                        }
+
+                        String playTimeSubtitle;
+                        if (child.isScreenTimeEnabled && child.dailyLimitMinutes > 0) {
+                          playTimeSubtitle = isAr
+                              ? 'المحدد: ${child.dailyLimitMinutes} دقيقة (المتبقي: ${remainingMins >= 0 ? "$remainingMins دقيقة" : "مفتوح"})'
+                              : 'Limit: ${child.dailyLimitMinutes} min (Left: ${remainingMins >= 0 ? "$remainingMins min" : "Open"})';
+                        } else {
+                          playTimeSubtitle = isAr ? 'لا يوجد حد زمني (مفتوح)' : 'No limit set (Unlimited)';
+                        }
+
+                        return _StatCard(
+                          title: isAr
+                              ? 'وقت لعب (${child.name}) اليوم'
+                              : 'Today\'s Playtime (${child.name})',
+                          value: playTimeValue,
+                          icon: Icons.access_time,
+                          color: Colors.blue,
+                          subtitle: playTimeSubtitle,
+                        );
+                      }),
 
                       const SizedBox(height: 16),
 
@@ -369,7 +401,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         children: [
                           Expanded(
                             child: _StatCard(
-                              title: 'الألعاب',
+                              title: isAr ? 'الألعاب' : 'Games',
                               value: '${_report!.gamesPlayed}',
                               icon: Icons.games,
                               color: Colors.green,
@@ -378,7 +410,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: _StatCard(
-                              title: 'المستويات',
+                              title: isAr ? 'المستويات' : 'Levels',
                               value: '${_report!.levelsCompleted}',
                               icon: Icons.star,
                               color: Colors.orange,
@@ -393,7 +425,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         children: [
                           Expanded(
                             child: _StatCard(
-                              title: 'النجوم',
+                              title: isAr ? 'النجوم' : 'Stars',
                               value: '${_report!.totalStars}',
                               icon: Icons.star,
                               color: Colors.amber,
@@ -402,8 +434,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: _StatCard(
-                              title: 'وقت اللعب',
-                              value: '${_report!.totalPlayTime} د',
+                              title: isAr ? 'وقت اللعب' : 'Play Time',
+                              value: isAr ? '${_report!.totalPlayTime} د' : '${_report!.totalPlayTime} min',
                               icon: Icons.timer,
                               color: Colors.purple,
                             ),
@@ -431,9 +463,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
-                                  'الرسوم البيانية',
-                                  style: TextStyle(
+                                Text(
+                                  isAr ? 'الرسوم البيانية' : 'Performance Charts',
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -441,7 +473,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.picture_as_pdf),
                                   onPressed: () => _exportToPDF(),
-                                  tooltip: 'تصدير PDF',
+                                  tooltip: isAr ? 'تصدير PDF' : 'Export PDF',
                                 ),
                               ],
                             ),
@@ -449,9 +481,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             
                             // Bar Chart - Game Statistics
                             if (_report!.gameStats.isNotEmpty) ...[
-                              const Text(
-                                'عدد مرات اللعب لكل لعبة',
-                                style: TextStyle(
+                              Text(
+                                isAr ? 'عدد مرات اللعب لكل لعبة' : 'Plays per Game',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -466,9 +498,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                               const SizedBox(height: 32),
                               
                               // Pie Chart - Game Distribution
-                              const Text(
-                                'توزيع الألعاب',
-                                style: TextStyle(
+                              Text(
+                                isAr ? 'توزيع الألعاب' : 'Game Distribution',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -481,12 +513,12 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 ),
                               ),
                             ] else
-                              const Padding(
-                                padding: EdgeInsets.all(32.0),
+                              Padding(
+                                padding: const EdgeInsets.all(32.0),
                                 child: Center(
                                   child: Text(
-                                    'لا توجد إحصائيات بعد',
-                                    style: TextStyle(color: Colors.grey),
+                                    isAr ? 'لا توجد إحصائيات بعد' : 'No game statistics yet',
+                                    style: const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -506,9 +538,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'إحصائيات الألعاب',
-                              style: TextStyle(
+                            Text(
+                              isAr ? 'إحصائيات الألعاب' : 'Game Breakdown',
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -523,22 +555,22 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        _getGameName(entry.key),
-                                        style: const TextStyle(fontSize: 16),
+                                        _getGameName(entry.key, isAr),
+                                        style: const TextStyle(fontSize: 15),
                                       ),
                                     ),
                                     Text(
-                                      '${entry.value} مرات',
+                                      isAr ? '${entry.value} مرات' : '${entry.value} plays',
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 13,
                                         color: Colors.grey[600],
                                       ),
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      'متوسط: ${avgScore.toStringAsFixed(0)}',
+                                      isAr ? 'متوسط: ${avgScore.toStringAsFixed(0)}' : 'Avg: ${avgScore.toStringAsFixed(0)}',
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 13,
                                         color: Colors.grey[600],
                                       ),
                                     ),
@@ -562,16 +594,16 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'الإعدادات',
-                              style: TextStyle(
+                            Text(
+                              isAr ? 'الإعدادات' : 'Parental Controls & Settings',
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 16),
                             SwitchListTile(
-                              title: const Text('تفعيل وضع الوالدين'),
+                              title: Text(isAr ? 'تفعيل وضع الوالدين' : 'Enable Parental Mode'),
                               value: _settings!.isParentModeEnabled,
                               onChanged: (value) async {
                                 final updated = _settings!.copyWith(
@@ -582,41 +614,43 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text('حد وقت اللعب اليومي'),
+                              title: Text(isAr ? 'حد وقت اللعب اليومي' : 'Daily Screen Time Limit'),
                               subtitle: Text(
                                 ScreenTimeService().activeChild.isScreenTimeEnabled &&
                                         ScreenTimeService().activeChild.dailyLimitMinutes > 0
-                                    ? '${ScreenTimeService().activeChild.dailyLimitMinutes} دقيقة لـ (${ScreenTimeService().activeChild.name})'
-                                    : 'غير محدد (مفتوح)',
+                                    ? (isAr
+                                        ? '${ScreenTimeService().activeChild.dailyLimitMinutes} دقيقة لـ (${ScreenTimeService().activeChild.name})'
+                                        : '${ScreenTimeService().activeChild.dailyLimitMinutes} min for (${ScreenTimeService().activeChild.name})')
+                                    : (isAr ? 'غير محدد (مفتوح)' : 'Unlimited (Open)'),
                               ),
-                              trailing: const Icon(Icons.arrow_forward_ios),
+                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                               onTap: () => _showAddOrEditChildDialog(
-                                  child: ScreenTimeService().activeChild),
+                                  child: ScreenTimeService().activeChild, isAr: isAr),
                             ),
                             ListTile(
-                              title: const Text('الألعاب المسموحة'),
+                              title: Text(isAr ? 'الألعاب المسموحة' : 'Allowed Games'),
                               subtitle: Text(
                                 _settings!.allowedGameIds.isEmpty
-                                    ? 'جميع الألعاب'
-                                    : '${_settings!.allowedGameIds.length} لعبة',
+                                    ? (isAr ? 'جميع الألعاب' : 'All Games')
+                                    : (isAr ? '${_settings!.allowedGameIds.length} لعبة' : '${_settings!.allowedGameIds.length} games'),
                               ),
-                              trailing: const Icon(Icons.arrow_forward_ios),
-                              onTap: () => _showGameSelectionDialog(),
+                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                              onTap: () => _showGameSelectionDialog(isAr),
                             ),
                             const Divider(),
                             ListTile(
-                              title: const Text('الفئة العمرية'),
+                              title: Text(isAr ? 'الفئة العمرية' : 'Age Bracket'),
                               subtitle: Text(
                                 _settings!.ageGroup != null
-                                    ? '${_settings!.ageGroup}-${_settings!.ageGroup! + 2} سنوات'
-                                    : 'غير محدد',
+                                    ? (isAr ? '${_settings!.ageGroup}-${_settings!.ageGroup! + 2} سنوات' : '${_settings!.ageGroup}-${_settings!.ageGroup! + 2} years')
+                                    : (isAr ? 'غير محدد' : 'Not set'),
                               ),
-                              trailing: const Icon(Icons.arrow_forward_ios),
-                              onTap: () => _showAgeGroupDialog(),
+                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                              onTap: () => _showAgeGroupDialog(isAr),
                             ),
                             SwitchListTile(
-                              title: const Text('تنبيهات الإنجازات'),
-                              subtitle: const Text('إشعار عند فتح إنجاز جديد'),
+                              title: Text(isAr ? 'تنبيهات الإنجازات' : 'Achievement Notifications'),
+                              subtitle: Text(isAr ? 'إشعار عند فتح إنجاز جديد' : 'Notify when a new badge is unlocked'),
                               value: _settings!.achievementAlerts,
                               onChanged: (value) async {
                                 final updated = _settings!.copyWith(
@@ -628,16 +662,16 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             ),
                             const Divider(),
                             ListTile(
-                              title: const Text('كلمة المرور'),
+                              title: Text(isAr ? 'كلمة المرور' : 'Parent Security PIN'),
                               subtitle: Text(
                                 _parentService.hasPassword()
-                                    ? 'تم إعداد كلمة المرور'
-                                    : 'لم يتم إعداد كلمة المرور',
+                                    ? (isAr ? 'تم إعداد كلمة المرور' : 'PIN configured')
+                                    : (isAr ? 'لم يتم إعداد كلمة المرور' : 'No PIN configured'),
                               ),
-                              trailing: const Icon(Icons.arrow_forward_ios),
-                              onTap: _parentService.hasPassword()
-                                  ? _changePassword
-                                  : _setupPassword,
+                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                              onTap: () => _parentService.hasPassword()
+                                  ? _changePassword(isAr)
+                                  : _setupPassword(isAr),
                             ),
                           ],
                         ),
@@ -645,7 +679,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       const SizedBox(height: 16),
                       // WhatsApp Direct Support Card
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [Color(0xFF25D366), Color(0xFF128C7E)],
@@ -664,54 +698,62 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.chat_rounded, color: Color(0xFF128C7E), size: 28),
+                              child: const Icon(Icons.chat_rounded, color: Color(0xFF128C7E), size: 24),
                             ),
-                            const SizedBox(width: 14),
-                            const Expanded(
+                            const SizedBox(width: 10),
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'دعم أولياء الأمور المباشر',
-                                    style: TextStyle(
+                                    isAr ? 'دعم أولياء الأمور المباشر' : 'Direct Parent Support',
+                                    style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(
-                                    'تواصل معنا عبر واتساب للمساعدة أو الاستفسارات\n01067481561',
-                                    style: TextStyle(
+                                    isAr
+                                        ? 'تواصل معنا عبر واتساب للمساعدة أو الاستفسارات\n01067481561'
+                                        : 'Contact us on WhatsApp for assistance\n01067481561',
+                                    style: const TextStyle(
                                       color: Colors.white70,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF128C7E),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                            const SizedBox(width: 8),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF128C7E),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
+                                onPressed: () async {
+                                  final Uri waUri = Uri.parse(
+                                    'https://wa.me/201067481561?text=${Uri.encodeComponent(isAr ? "مرحباً، أحتاج مساعدة أو استفسار بخصوص لوحة تحكم الوالدين في تطبيق Brainquests" : "Hello, I need assistance regarding Parent Dashboard in Brainquests")}',
+                                  );
+                                  try {
+                                    await launchUrl(waUri, mode: LaunchMode.externalApplication);
+                                  } catch (_) {}
+                                },
+                                child: Text(isAr ? 'مراسلة' : 'Chat',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                               ),
-                              onPressed: () async {
-                                final Uri waUri = Uri.parse(
-                                  'https://wa.me/201067481561?text=${Uri.encodeComponent("مرحباً، أحتاج مساعدة أو استفسار بخصوص لوحة تحكم الوالدين في تطبيق Brainquests")}',
-                                );
-                                try {
-                                  await launchUrl(waUri, mode: LaunchMode.externalApplication);
-                                } catch (_) {}
-                              },
-                              child: const Text('مراسلة', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -727,9 +769,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  Widget _buildParentAccountBanner() {
+  Widget _buildParentAccountBanner(bool isAr) {
     final isLoggedIn = _parentProfile['isLoggedIn'] == 'true';
-    final name = _parentProfile['name'] ?? 'ولي الأمر';
+    final name = _parentProfile['name'] ?? (isAr ? 'ولي الأمر' : 'Parent');
     final phone = _parentProfile['phone'] ?? '';
 
     return Container(
@@ -747,37 +789,45 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       ),
       child: Row(
         children: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isLoggedIn ? Colors.teal : AppTheme.primaryBlue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isLoggedIn ? Colors.teal : AppTheme.primaryBlue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            ),
-            onPressed: () {
-              ParentAccountDialog.show(context, onAccountUpdated: _loadData);
-            },
-            child: Text(
-              isLoggedIn ? 'إدارة الحساب' : 'تسجيل حساب',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              onPressed: () {
+                ParentAccountDialog.show(context, onAccountUpdated: _loadData);
+              },
+              child: Text(
+                isLoggedIn
+                    ? (isAr ? 'إدارة الحساب' : 'Manage Account')
+                    : (isAr ? 'تسجيل حساب' : 'Register'),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: isAr ? MainAxisAlignment.end : MainAxisAlignment.start,
                   children: [
-                    Text(
-                      isLoggedIn ? name : 'حساب ولي الأمر',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Colors.black87,
+                    Flexible(
+                      child: Text(
+                        isLoggedIn ? name : (isAr ? 'حساب ولي الأمر' : 'Parent Account'),
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -791,13 +841,17 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 const SizedBox(height: 4),
                 Text(
                   isLoggedIn
-                      ? (phone.isNotEmpty ? 'الواتساب: $phone • متصل بالبورتال' : 'الحساب متصل بالبورتال المركزي')
-                      : 'سجّل حسابك لحفظ تقدم واشتراكات طفلك',
+                      ? (phone.isNotEmpty
+                          ? (isAr ? 'الواتساب: $phone • متصل' : 'WhatsApp: $phone • Connected')
+                          : (isAr ? 'الحساب متصل بالبورتال المركزي' : 'Connected to central portal'))
+                      : (isAr
+                          ? 'سجّل حسابك لحفظ تقدم واشتراكات طفلك'
+                          : 'Register account to sync progress & VIP'),
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey.shade600,
                   ),
-                  textAlign: TextAlign.right,
+                  textAlign: isAr ? TextAlign.right : TextAlign.left,
                 ),
               ],
             ),
@@ -807,7 +861,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  Widget _buildChildrenProfilesSection() {
+  Widget _buildChildrenProfilesSection(bool isAr) {
     final screenTime = ScreenTimeService();
     final children = screenTime.children;
     final activeChild = screenTime.activeChild;
@@ -833,39 +887,45 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               const Icon(Icons.family_restroom_rounded,
                   color: AppTheme.primaryBlue, size: 24),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'أطفالي وتحديد وقت اللعب ⏳',
-                  style: TextStyle(
+                  isAr ? 'أطفالي وتحديد وقت اللعب ⏳' : 'Children & Screen Time ⏳',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
               ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryBlue,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              const SizedBox(width: 6),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
+                  icon: const Icon(Icons.add, size: 16),
+                  label: Text(
+                    isAr ? 'إضافة طفل' : 'Add Child',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                  onPressed: () => _showAddOrEditChildDialog(isAr: isAr),
                 ),
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text(
-                  'إضافة طفل',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-                onPressed: () => _showAddOrEditChildDialog(),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
-            'خصص وقتاً مستقلاً لكل طفل (من ربع ساعة فما فوق). الطفل المفعّل هو من سيطبق عليه المؤقت عند استخدام التطبيق:',
+            isAr
+                ? 'خصص وقتاً مستقلاً لكل طفل (من ربع ساعة فما فوق). الطفل المفعّل هو من سيطبق عليه المؤقت عند استخدام التطبيق:'
+                : 'Set individual daily screen time limits for each child. Active child is monitored during app usage:',
             style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
           ),
           const SizedBox(height: 14),
@@ -939,7 +999,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
-                                    '${c.age} سنوات',
+                                    isAr ? '${c.age} سنوات' : '${c.age} yrs',
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
@@ -952,8 +1012,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             const SizedBox(height: 3),
                             Text(
                               c.isScreenTimeEnabled && limitMins > 0
-                                  ? 'المحدد: $limitMins دقيقة (المتبقي: ${c.remainingMinutes >= 0 ? "${c.remainingMinutes} دقيقة" : "مفتوح"})'
-                                  : 'وقت اللعب غير مقيد (مفتوح)',
+                                  ? (isAr
+                                      ? 'المحدد: $limitMins دقيقة (المتبقي: ${c.remainingMinutes >= 0 ? "${c.remainingMinutes} دقيقة" : "مفتوح"})'
+                                      : 'Limit: $limitMins min (Remaining: ${c.remainingMinutes >= 0 ? "${c.remainingMinutes} min" : "Open"})')
+                                  : (isAr ? 'وقت اللعب غير مقيد (مفتوح)' : 'Playtime unlimited (Open)'),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: c.isLimitReached
@@ -971,9 +1033,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       // Edit button
                       IconButton(
                         icon: const Icon(Icons.tune_rounded, size: 20),
-                        tooltip: 'تخصيص الوقت',
+                        tooltip: isAr ? 'تخصيص الوقت' : 'Customize Time',
                         color: Colors.grey.shade700,
-                        onPressed: () => _showAddOrEditChildDialog(child: c),
+                        onPressed: () => _showAddOrEditChildDialog(child: c, isAr: isAr),
                       ),
                     ],
                   ),
@@ -1002,28 +1064,33 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (isActive)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade100,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.check_circle,
-                                  color: Colors.green, size: 14),
-                              const SizedBox(width: 4),
-                              Text(
-                                'يلعب على الجهاز الآن',
-                                style: TextStyle(
-                                  color: Colors.green.shade900,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.check_circle,
+                                    color: Colors.green, size: 14),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    isAr ? 'يلعب على الجهاز الآن' : 'Active on device',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.green.shade900,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         )
                       else
@@ -1034,8 +1101,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 horizontal: 8, vertical: 2),
                           ),
                           icon: const Icon(Icons.play_circle_outline, size: 16),
-                          label: const Text('تفعيل للعب الآن',
-                              style: TextStyle(fontSize: 12)),
+                          label: Text(isAr ? 'تفعيل للعب الآن' : 'Set as Active',
+                              style: const TextStyle(fontSize: 12)),
                           onPressed: () async {
                             await screenTime.setActiveChild(c.id);
                             setState(() {});
@@ -1050,8 +1117,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 horizontal: 6, vertical: 2),
                           ),
                           child:
-                              const Text('حذف', style: TextStyle(fontSize: 11)),
-                          onPressed: () => _confirmDeleteChild(c),
+                              Text(isAr ? 'حذف' : 'Delete', style: const TextStyle(fontSize: 11)),
+                          onPressed: () => _confirmDeleteChild(c, isAr),
                         ),
                     ],
                   ),
@@ -1064,7 +1131,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  void _showAddOrEditChildDialog({ChildProfile? child}) {
+  void _showAddOrEditChildDialog({ChildProfile? child, bool isAr = true}) {
     final isEditing = child != null;
     final nameController =
         TextEditingController(text: isEditing ? child.name : '');
@@ -1076,7 +1143,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text(isEditing ? 'تخصيص وقت الطفل' : 'إضافة طفل جديد'),
+          title: Text(isEditing
+              ? (isAr ? 'تخصيص وقت الطفل' : 'Customize Child Profile')
+              : (isAr ? 'إضافة طفل جديد' : 'Add Child Profile')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1084,17 +1153,17 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'اسم الطفل',
-                    hintText: 'مثال: أحمد أو سارة',
-                    prefixIcon: Icon(Icons.child_care),
+                  decoration: InputDecoration(
+                    labelText: isAr ? 'اسم الطفل' : 'Child Name',
+                    hintText: isAr ? 'مثال: أحمد أو سارة' : 'e.g. Leo or Sarah',
+                    prefixIcon: const Icon(Icons.child_care),
                   ),
                 ),
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    const Text('العمر:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(isAr ? 'العمر:' : 'Age:',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(width: 12),
                     DropdownButton<int>(
                       value: selectedAge,
@@ -1102,7 +1171,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         10,
                         (index) => DropdownMenuItem(
                           value: index + 3,
-                          child: Text('${index + 3} سنوات'),
+                          child: Text(isAr ? '${index + 3} سنوات' : '${index + 3} years'),
                         ),
                       ),
                       onChanged: (val) {
@@ -1116,11 +1185,11 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 const Divider(height: 24),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('تفعيل التحكم في وقت اللعب',
-                      style: TextStyle(
+                  title: Text(isAr ? 'تفعيل التحكم في وقت اللعب' : 'Enable Daily Screen Time Limit',
+                      style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 14)),
-                  subtitle: const Text('إغلاق التطبيق بعد انتهاء الوقت المخصص',
-                      style: TextStyle(fontSize: 12)),
+                  subtitle: Text(isAr ? 'إغلاق التطبيق بعد انتهاء الوقت المخصص' : 'Lock app when allotted time ends',
+                      style: const TextStyle(fontSize: 12)),
                   value: isEnabled,
                   onChanged: (val) {
                     setDialogState(() => isEnabled = val);
@@ -1128,35 +1197,35 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 ),
                 if (isEnabled) ...[
                   const SizedBox(height: 10),
-                  const Text('الحد اليومي للعب:',
+                  Text(isAr ? 'الحد اليومي للعب:' : 'Daily Limit:',
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 8,
                     runSpacing: 6,
                     children: [
                       _buildLimitChip(
-                          '15 دقيقة (ربع ساعة)', 15, selectedLimit, (val) {
+                          isAr ? '15 دقيقة (ربع ساعة)' : '15 min', 15, selectedLimit, (val) {
                         setDialogState(() => selectedLimit = val);
                       }),
                       _buildLimitChip(
-                          '30 دقيقة (نصف ساعة)', 30, selectedLimit, (val) {
+                          isAr ? '30 دقيقة (نصف ساعة)' : '30 min', 30, selectedLimit, (val) {
                         setDialogState(() => selectedLimit = val);
                       }),
-                      _buildLimitChip('45 دقيقة', 45, selectedLimit, (val) {
-                        setDialogState(() => selectedLimit = val);
-                      }),
-                      _buildLimitChip(
-                          '60 دقيقة (ساعة)', 60, selectedLimit, (val) {
+                      _buildLimitChip(isAr ? '45 دقيقة' : '45 min', 45, selectedLimit, (val) {
                         setDialogState(() => selectedLimit = val);
                       }),
                       _buildLimitChip(
-                          '90 دقيقة (ساعة ونصف)', 90, selectedLimit, (val) {
+                          isAr ? '60 دقيقة (ساعة)' : '60 min (1 hr)', 60, selectedLimit, (val) {
                         setDialogState(() => selectedLimit = val);
                       }),
                       _buildLimitChip(
-                          '120 دقيقة (ساعتان)', 120, selectedLimit, (val) {
+                          isAr ? '90 دقيقة (ساعة ونصف)' : '90 min (1.5 hr)', 90, selectedLimit, (val) {
+                        setDialogState(() => selectedLimit = val);
+                      }),
+                      _buildLimitChip(
+                          isAr ? '120 دقيقة (ساعتان)' : '120 min (2 hrs)', 120, selectedLimit, (val) {
                         setDialogState(() => selectedLimit = val);
                       }),
                     ],
@@ -1168,7 +1237,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('إلغاء'),
+              child: Text(isAr ? 'إلغاء' : 'Cancel'),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -1179,7 +1248,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 final name = nameController.text.trim();
                 if (name.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('يرجى إدخال اسم الطفل')),
+                    SnackBar(content: Text(isAr ? 'يرجى إدخال اسم الطفل' : 'Please enter child name')),
                   );
                   return;
                 }
@@ -1204,7 +1273,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   setState(() {});
                 }
               },
-              child: const Text('حفظ'),
+              child: Text(isAr ? 'حفظ' : 'Save'),
             ),
           ],
         ),
@@ -1223,16 +1292,18 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  void _confirmDeleteChild(ChildProfile child) {
+  void _confirmDeleteChild(ChildProfile child, bool isAr) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('حذف ملف الطفل'),
-        content: Text('هل أنت متأكد من رغبتك في حذف ملف (${child.name})؟'),
+        title: Text(isAr ? 'حذف ملف الطفل' : 'Delete Child Profile'),
+        content: Text(isAr
+            ? 'هل أنت متأكد من رغبتك في حذف ملف (${child.name})؟'
+            : 'Are you sure you want to delete profile for (${child.name})?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء'),
+            child: Text(isAr ? 'إلغاء' : 'Cancel'),
           ),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -1243,14 +1314,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 setState(() {});
               }
             },
-            child: const Text('حذف'),
+            child: Text(isAr ? 'حذف' : 'Delete'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPasswordScreen() {
+  Widget _buildPasswordScreen(bool isAr) {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -1258,7 +1329,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
         ),
         child: SafeArea(
           child: Center(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(32.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1268,55 +1339,92 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     size: 80,
                     color: Colors.white,
                   ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'لوحة تحكم الوالدين',
-                    style: TextStyle(
+                  const SizedBox(height: 24),
+                  Text(
+                    isAr ? 'لوحة تحكم الوالدين' : 'Parent Dashboard',
+                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Text(
                     _parentService.hasPassword()
-                        ? 'يرجى إدخال كلمة المرور'
-                        : 'لم يتم إعداد كلمة المرور بعد',
+                        ? (isAr ? 'يرجى إدخال كلمة المرور' : 'Please enter parent PIN')
+                        : (isAr ? 'لم يتم إعداد كلمة المرور بعد' : 'No parent PIN set yet'),
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                      color: Colors.white70,
+                      fontSize: 15,
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'كلمة المرور',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _parentService.hasPassword()
-                        ? _authenticate
-                        : _setupPassword,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppTheme.primaryBlue,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 48,
-                        vertical: 16,
+                  if (_parentService.hasPassword()) ...[
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 320),
+                      child: TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: isAr ? 'كلمة المرور' : 'PIN',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        onSubmitted: (_) => _authenticate(isAr),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => _authenticate(isAr),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.yellowAccent,
+                        foregroundColor: AppTheme.darkText,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 48,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        isAr ? 'دخول' : 'Login',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ] else ...[
+                    ElevatedButton(
+                      onPressed: () => _setupPassword(isAr),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.yellowAccent,
+                        foregroundColor: AppTheme.darkText,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        isAr ? 'إعداد كلمة المرور' : 'Set Parent PIN',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
                     child: Text(
-                      _parentService.hasPassword() ? 'دخول' : 'إعداد كلمة المرور',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      isAr ? 'العودة للرئيسية' : 'Back to Home',
+                      style: const TextStyle(color: Colors.white70),
                     ),
                   ),
                 ],
@@ -1330,21 +1438,21 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
 
 
 
-  void _showGameSelectionDialog() {
+  void _showGameSelectionDialog(bool isAr) {
     final selectedGames = Set<String>.from(_settings!.allowedGameIds);
     
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('الألعاب المسموحة'),
+          title: Text(isAr ? 'الألعاب المسموحة' : 'Allowed Games'),
           content: SizedBox(
             width: double.maxFinite,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CheckboxListTile(
-                  title: const Text('جميع الألعاب'),
+                  title: Text(isAr ? 'جميع الألعاب' : 'All Games'),
                   value: selectedGames.isEmpty,
                   onChanged: (value) {
                     setDialogState(() {
@@ -1366,7 +1474,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       final isSelected = selectedGames.contains(game.id);
                       
                       return CheckboxListTile(
-                        title: Text(_getGameName(game.id)),
+                        title: Text(_getGameName(game.id, isAr)),
                         subtitle: Text(game.description),
                         value: isSelected,
                         onChanged: (value) {
@@ -1389,7 +1497,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: Text(isAr ? 'إلغاء' : 'Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -1405,14 +1513,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   SnackBar(
                     content: Text(
                       selectedGames.isEmpty
-                          ? 'تم تفعيل جميع الألعاب'
-                          : 'تم تحديث الألعاب المسموحة',
+                          ? (isAr ? 'تم تفعيل جميع الألعاب' : 'All games allowed')
+                          : (isAr ? 'تم تحديث الألعاب المسموحة' : 'Allowed games updated'),
                     ),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
-              child: const Text('حفظ'),
+              child: Text(isAr ? 'حفظ' : 'Save'),
             ),
           ],
         ),
@@ -1420,43 +1528,43 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  void _showAgeGroupDialog() {
+  void _showAgeGroupDialog(bool isAr) {
     int? selectedAgeGroup = _settings!.ageGroup;
     
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('الفئة العمرية للطفل'),
+          title: Text(isAr ? 'الفئة العمرية للطفل' : 'Child Age Group'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<int?>(
-                title: const Text('3-5 سنوات'),
+                title: Text(isAr ? '3-5 سنوات' : '3-5 years'),
                 value: 3,
                 groupValue: selectedAgeGroup,
                 onChanged: (value) => setDialogState(() => selectedAgeGroup = value),
               ),
               RadioListTile<int?>(
-                title: const Text('6-8 سنوات'),
+                title: Text(isAr ? '6-8 سنوات' : '6-8 years'),
                 value: 6,
                 groupValue: selectedAgeGroup,
                 onChanged: (value) => setDialogState(() => selectedAgeGroup = value),
               ),
               RadioListTile<int?>(
-                title: const Text('9-12 سنة'),
+                title: Text(isAr ? '9-12 سنة' : '9-12 years'),
                 value: 9,
                 groupValue: selectedAgeGroup,
                 onChanged: (value) => setDialogState(() => selectedAgeGroup = value),
               ),
               RadioListTile<int?>(
-                title: const Text('13+ سنة'),
+                title: Text(isAr ? '13+ سنة' : '13+ years'),
                 value: 13,
                 groupValue: selectedAgeGroup,
                 onChanged: (value) => setDialogState(() => selectedAgeGroup = value),
               ),
               RadioListTile<int?>(
-                title: const Text('غير محدد'),
+                title: Text(isAr ? 'غير محدد' : 'Not specified'),
                 value: null,
                 groupValue: selectedAgeGroup,
                 onChanged: (value) => setDialogState(() => selectedAgeGroup = value),
@@ -1466,7 +1574,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: Text(isAr ? 'إلغاء' : 'Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -1475,7 +1583,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 _loadData();
                 Navigator.pop(context);
               },
-              child: const Text('حفظ'),
+              child: Text(isAr ? 'حفظ' : 'Save'),
             ),
           ],
         ),
@@ -1483,20 +1591,36 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  String _getGameName(String gameId) {
-    final names = {
-      'memory_cards': 'بطاقات الذاكرة',
-      'find_difference': 'إيجاد الفروقات',
-      'shape_matcher': 'مطابقة الأشكال',
-      'pattern_logic': 'منطق الأنماط',
-      'quick_math': 'الرياضيات السريعة',
-      'color_memory': 'ذاكرة الألوان',
-      'word_puzzle': 'ألغاز الكلمات',
-      'maze_runner': 'متاهة',
-      'sorting_game': 'لعبة الترتيب',
-      'jigsaw_puzzle': 'بازل',
-    };
-    return names[gameId] ?? gameId;
+  String _getGameName(String gameId, [bool isAr = true]) {
+    if (isAr) {
+      final names = {
+        'memory_cards': 'بطاقات الذاكرة',
+        'find_difference': 'إيجاد الفروقات',
+        'shape_matcher': 'مطابقة الأشكال',
+        'pattern_logic': 'منطق الأنماط',
+        'quick_math': 'الرياضيات السريعة',
+        'color_memory': 'ذاكرة الألوان',
+        'word_puzzle': 'ألغاز الكلمات',
+        'maze_runner': 'متاهة',
+        'sorting_game': 'لعبة الترتيب',
+        'jigsaw_puzzle': 'بازل',
+      };
+      return names[gameId] ?? gameId;
+    } else {
+      final names = {
+        'memory_cards': 'Memory Cards',
+        'find_difference': 'Find Differences',
+        'shape_matcher': 'Shape Matcher',
+        'pattern_logic': 'Pattern Logic',
+        'quick_math': 'Quick Math',
+        'color_memory': 'Color Memory',
+        'word_puzzle': 'Word Puzzle',
+        'maze_runner': 'Maze Runner',
+        'sorting_game': 'Sorting Game',
+        'jigsaw_puzzle': 'Jigsaw Puzzle',
+      };
+      return names[gameId] ?? gameId;
+    }
   }
 
   BarChartData _buildBarChartData() {
@@ -2018,12 +2142,16 @@ class _StatCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
           ),
           if (subtitle != null) ...[

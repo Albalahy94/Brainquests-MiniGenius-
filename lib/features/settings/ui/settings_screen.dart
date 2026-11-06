@@ -7,6 +7,7 @@ import 'package:minigenius/generated/l10n/app_localizations.dart';
 import 'package:minigenius/core/theme/app_theme.dart';
 import 'package:minigenius/core/providers/app_state_provider.dart';
 import 'package:minigenius/core/routes/app_routes.dart';
+import 'package:minigenius/core/widgets/parental_gate_dialog.dart';
 import 'package:minigenius/core/services/storage_service.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -39,8 +40,11 @@ class SettingsScreen extends StatelessWidget {
                   : 'Unlock +100 levels, Cognitive Radar & game themes',
             ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.premium);
+            onTap: () async {
+              final isParent = await showParentalGateDialog(context);
+              if (isParent && context.mounted) {
+                Navigator.pushNamed(context, AppRoutes.premium);
+              }
             },
           ),
           ListTile(

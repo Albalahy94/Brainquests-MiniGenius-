@@ -33,13 +33,13 @@ class ParentDashboardService {
     );
 
     // Calculate statistics
-    int totalPlayTime = 0;
+    int totalPlaySeconds = 0;
     final gameStats = <String, int>{};
     final gameScores = <String, List<int>>{};
     final achievementsUnlocked = <String>[];
 
     for (final session in sessions) {
-      totalPlayTime += session.duration.inMinutes;
+      totalPlaySeconds += session.duration.inSeconds;
       
       gameStats[session.gameId] = (gameStats[session.gameId] ?? 0) + 1;
       
@@ -72,6 +72,11 @@ class ParentDashboardService {
       }
     }
 
+    int totalPlayTime = (totalPlaySeconds / 60).round();
+    if (totalPlaySeconds > 0 && totalPlayTime == 0) {
+      totalPlayTime = 1;
+    }
+
     return ChildProgressReport(
       reportDate: DateTime.now(),
       totalPlayTime: totalPlayTime,
@@ -94,11 +99,15 @@ class ParentDashboardService {
       endDate: endOfDay,
     );
 
-    int totalMinutes = 0;
+    int totalSeconds = 0;
     for (final session in sessions) {
-      totalMinutes += session.duration.inMinutes;
+      totalSeconds += session.duration.inSeconds;
     }
 
+    int totalMinutes = (totalSeconds / 60).round();
+    if (totalSeconds > 0 && totalMinutes == 0) {
+      totalMinutes = 1;
+    }
     return totalMinutes;
   }
 
