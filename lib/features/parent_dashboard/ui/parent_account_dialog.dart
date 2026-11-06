@@ -562,20 +562,24 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
           ],
           TextFormField(
             controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
+            keyboardType: _isRegisterMode ? TextInputType.emailAddress : TextInputType.text,
             textAlign: isAr ? TextAlign.right : TextAlign.left,
             decoration: InputDecoration(
               labelText: _isRegisterMode
                   ? (isAr ? 'البريد الإلكتروني *' : 'Email Address *')
-                  : (isAr ? 'البريد الإلكتروني أو اسم المستخدم *' : 'Email or Username *'),
-              hintText: 'parent@example.com',
-              prefixIcon: const Icon(Icons.email_outlined),
+                  : (isAr ? 'البريد الإلكتروني أو رقم الهاتف *' : 'Email or Phone Number *'),
+              hintText: _isRegisterMode
+                  ? 'parent@example.com'
+                  : (isAr ? 'أدخل إيميلك أو رقم الهاتف المسجل' : 'Enter email or phone number'),
+              prefixIcon: Icon(_isRegisterMode ? Icons.email_outlined : Icons.account_circle_outlined),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
             validator: (v) {
               if (v == null || v.trim().isEmpty) {
-                return isAr ? 'يرجى إدخال البريد الإلكتروني' : 'Please enter email';
+                return _isRegisterMode
+                    ? (isAr ? 'يرجى إدخال البريد الإلكتروني' : 'Please enter email')
+                    : (isAr ? 'يرجى إدخال البريد الإلكتروني أو رقم الهاتف' : 'Please enter email or phone number');
               }
               if (_isRegisterMode && !v.contains('@')) {
                 return isAr ? 'صيغة البريد الإلكتروني غير صحيحة' : 'Invalid email format';
