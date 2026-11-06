@@ -6,6 +6,7 @@ import '../../../../core/models/game_progress.dart';
 import '../../../results/ui/result_screen.dart';
 import '../../widgets/game_header.dart';
 import '../models/difference_theme.dart';
+import '../widgets/nature_landscape_painter.dart';
 
 class FindDifferenceGameScreen extends StatefulWidget {
   final int level;
@@ -193,36 +194,29 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Background Gradient
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: _scene.backgroundGradient,
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          // Realistic Nature Scenery Background (Real Natural Image or Illustrated Nature Landscape)
+          if (_scene.imageAsset != null) ...[
+            Positioned.fill(
+              child: Image.asset(
+                _scene.imageAsset!,
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-
-          // Ground / Horizon ambient styling
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: constraints.maxHeight * 0.35,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black.withOpacity(0.0),
-                    Colors.black.withOpacity(0.18),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.06),
+              ),
+            ),
+          ] else ...[
+            Positioned.fill(
+              child: CustomPaint(
+                painter: NatureLandscapePainter(
+                  level: _scene.level,
+                  colors: _scene.backgroundGradient,
                 ),
               ),
             ),
-          ),
+          ],
 
           // Base Elements (Identical on both Image A and Image B)
           ..._scene.baseElements.map((el) {
@@ -379,20 +373,23 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white.withOpacity(0.3)),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(_scene.mainIcon, color: Colors.amber, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        sceneTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(_scene.mainIcon, color: Colors.amber, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          sceneTitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -523,16 +520,23 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Status text
-                    Text(
-                      isAr
-                          ? 'ابحث عن $_totalDifferences فروقات بين الصورتين!'
-                          : 'Find $_totalDifferences differences!',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Text(
+                          isAr
+                              ? 'ابحث عن $_totalDifferences فروقات بين الصورتين!'
+                              : 'Find $_totalDifferences differences!',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     // Hint Button
                     ElevatedButton.icon(
                       onPressed: _giveHint,

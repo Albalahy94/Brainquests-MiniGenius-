@@ -1,8 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:minigenius/generated/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:minigenius/core/theme/app_theme.dart';
 import 'package:minigenius/core/models/game_info.dart';
 import 'package:minigenius/core/routes/app_routes.dart';
 import 'package:minigenius/core/services/parent_dashboard_service.dart';
@@ -11,7 +10,6 @@ import '../../../core/widgets/glassmorphic_container.dart';
 import '../widgets/game_card.dart';
 import '../widgets/bottom_navigation.dart';
 import '../widgets/animated_background.dart';
-import '../../../core/widgets/parental_gate_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -85,11 +83,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(width: 8),
                           GestureDetector(
-                            onTap: () async {
-                              final passed = await showParentalGateDialog(context);
-                              if (passed && context.mounted) {
-                                Navigator.pushNamed(context, AppRoutes.premium);
-                              }
+                            onTap: () {
+                              Navigator.pushNamed(context, AppRoutes.premium);
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -177,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
-                        childAspectRatio: 1.0,
+                        childAspectRatio: 0.88,
                       ),
                       itemCount: GameDefinitions.allGames.length,
                       itemBuilder: (context, index) {

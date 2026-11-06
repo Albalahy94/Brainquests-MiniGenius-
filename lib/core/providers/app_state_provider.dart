@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/licensing_api_service.dart';
 import '../models/user_progress.dart';
 import '../models/game_progress.dart';
@@ -11,12 +12,35 @@ class AppStateProvider extends ChangeNotifier {
   Map<String, GameProgress> _gameProgress = {};
 
   bool get isDarkMode => _userProgress?.isDarkMode ?? false;
-  Locale get locale => Locale(_userProgress?.languageCode ?? 'en');
+  Locale get locale {
+    final lang = _userProgress?.languageCode;
+    if (lang != null && lang.isNotEmpty) {
+      return Locale(lang);
+    }
+    final deviceLang = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    return deviceLang == 'ar' ? const Locale('ar') : const Locale('en');
+  }
 
   Future<void> initialize() async {
     try {
       await _storageService.init();
       _userProgress = _storageService.getUserProgress();
+
+      // On first launch or if user hasn't explicitly chosen, match device system language
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final hasSelected = prefs.getBool('has_user_selected_language') ?? false;
+        if (!hasSelected) {
+          final deviceLang = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+          final initialLang = deviceLang == 'ar' ? 'ar' : 'en';
+          if (_userProgress != null && _userProgress!.languageCode != initialLang) {
+            _userProgress!.languageCode = initialLang;
+            await _storageService.saveUserProgress(_userProgress!);
+          }
+        }
+      } catch (e) {
+        debugPrint('Device language auto-detect note: $e');
+      }
       
       // Load all game progress
       final gameIds = [
@@ -64,8 +88,12 @@ class AppStateProvider extends ChangeNotifier {
     updateUserProgress((progress) => progress.copyWith(isDarkMode: newValue));
   }
 
-  void setLanguage(String languageCode) {
+  void setLanguage(String languageCode) async {
     if (_userProgress == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('has_user_selected_language', true);
+    } catch (_) {}
     updateUserProgress((progress) => progress.copyWith(languageCode: languageCode));
   }
 

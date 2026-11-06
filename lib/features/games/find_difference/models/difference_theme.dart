@@ -59,6 +59,7 @@ class DifferenceScene {
   final String titleAr;
   final String titleEn;
   final IconData mainIcon;
+  final String? imageAsset;
   final List<Color> backgroundGradient;
   final List<DifferenceElement> baseElements;
   final List<DifferenceSpot> differences;
@@ -68,6 +69,7 @@ class DifferenceScene {
     required this.titleAr,
     required this.titleEn,
     required this.mainIcon,
+    this.imageAsset,
     required this.backgroundGradient,
     required this.baseElements,
     required this.differences,
@@ -76,24 +78,23 @@ class DifferenceScene {
 
 class DifferenceLibrary {
   static final List<DifferenceScene> scenes = [
-    // Level 1: الحديقة اللطيفة والحيوانات (Sunny Park & Animals) - 3 differences
+    // Level 1: حديقة الأشجار والطبيعة (Sunny Park & Trees) - 3 differences
     DifferenceScene(
       level: 1,
-      titleAr: 'حديقة الحيوانات اللطيفة',
-      titleEn: 'Sunny Park & Pets',
-      mainIcon: Icons.pets_rounded,
+      titleAr: 'حديقة الأشجار والطبيعة',
+      titleEn: 'Sunny Nature Park',
+      mainIcon: Icons.park_rounded,
+      imageAsset: 'assets/images/cartoon_park.png',
       backgroundGradient: [const Color(0xFF81D4FA), const Color(0xFFA5D6A7)],
       baseElements: const [
         DifferenceElement(icon: Icons.wb_sunny_rounded, color: Colors.amber, x: 0.82, y: 0.15, size: 44),
         DifferenceElement(icon: Icons.cloud_rounded, color: Colors.white, x: 0.22, y: 0.18, size: 38),
-        DifferenceElement(icon: Icons.park_rounded, color: Colors.green, x: 0.15, y: 0.62, size: 52),
-        DifferenceElement(icon: Icons.pets_rounded, color: Colors.brown, x: 0.5, y: 0.68, size: 40),
         DifferenceElement(icon: Icons.local_florist_rounded, color: Colors.pink, x: 0.85, y: 0.78, size: 30),
       ],
       differences: [
-        DifferenceSpot(id: 0, x: 0.48, y: 0.22, icon: Icons.cloud_outlined, color: Colors.white70, size: 34, hintAr: 'سحابة إضافية', hintEn: 'Extra cloud'),
-        DifferenceSpot(id: 1, x: 0.28, y: 0.75, icon: Icons.local_florist_rounded, color: Colors.orange, size: 28, hintAr: 'زهرة برتقالية', hintEn: 'Orange flower'),
-        DifferenceSpot(id: 2, x: 0.75, y: 0.48, icon: Icons.flutter_dash_rounded, color: Colors.blueAccent, size: 32, hintAr: 'عصفور أزرق', hintEn: 'Blue bird'),
+        DifferenceSpot(id: 0, x: 0.52, y: 0.22, icon: Icons.cloud_outlined, color: Colors.white, size: 36, hintAr: 'سحابة بيضاء في السماء', hintEn: 'White cloud in sky'),
+        DifferenceSpot(id: 1, x: 0.28, y: 0.75, icon: Icons.local_florist_rounded, color: Colors.orange, size: 30, hintAr: 'زهرة برتقالية على العشب', hintEn: 'Orange flower on grass'),
+        DifferenceSpot(id: 2, x: 0.72, y: 0.45, icon: Icons.flutter_dash_rounded, color: Colors.blueAccent, size: 32, hintAr: 'عصفور أزرق بين الأشجار', hintEn: 'Blue bird among trees'),
       ],
     ),
 
@@ -144,6 +145,7 @@ class DifferenceLibrary {
       titleAr: 'المزرعة الخضراء السعيدة',
       titleEn: 'Green Farm & Barn',
       mainIcon: Icons.agriculture_rounded,
+      imageAsset: 'assets/images/cartoon_park.png',
       backgroundGradient: [const Color(0xFFE9EDC9), const Color(0xFFCCD5AE), const Color(0xFF588157)],
       baseElements: const [
         DifferenceElement(icon: Icons.cottage_rounded, color: Colors.redAccent, x: 0.5, y: 0.42, size: 52),
@@ -165,6 +167,7 @@ class DifferenceLibrary {
       titleAr: 'سفاري الحيوانات البرية',
       titleEn: 'Wild Safari Expedition',
       mainIcon: Icons.forest_rounded,
+      imageAsset: 'assets/images/cartoon_park.png',
       backgroundGradient: [const Color(0xFF556B2F), const Color(0xFF2E8B57), const Color(0xFF1B4332)],
       baseElements: const [
         DifferenceElement(icon: Icons.forest_rounded, color: Colors.green, x: 0.18, y: 0.4, size: 50),
@@ -432,6 +435,7 @@ class DifferenceLibrary {
       titleAr: 'الغابة المسحورة والمخلوقات اللطيفة',
       titleEn: 'Enchanted Magic Woods',
       mainIcon: Icons.auto_awesome_rounded,
+      imageAsset: 'assets/images/cartoon_park.png',
       backgroundGradient: [const Color(0xFF134E5E), const Color(0xFF71B280)],
       baseElements: const [
         DifferenceElement(icon: Icons.forest_rounded, color: Colors.teal, x: 0.2, y: 0.48, size: 52),

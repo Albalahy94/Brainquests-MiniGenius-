@@ -117,23 +117,26 @@ class _MazeRunnerSelectScreenState extends State<MazeRunnerSelectScreen> {
                         color: Colors.white.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.check_circle_outline, color: AppTheme.mintGreen, size: 16),
-                          const SizedBox(width: 6),
-                          Text(
-                            isAr ? 'المراحل 1-10 مجانية' : 'Levels 1-10 Free',
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
-                          ),
-                          const SizedBox(width: 12),
-                          const Icon(Icons.workspace_premium, color: Color(0xFFFFD54F), size: 16),
-                          const SizedBox(width: 6),
-                          Text(
-                            isAr ? 'المراحل 11-20 للمحترفين VIP' : 'Levels 11-20 VIP Pro',
-                            style: const TextStyle(color: Color(0xFFFFD54F), fontSize: 12, fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.check_circle_outline, color: AppTheme.mintGreen, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              isAr ? 'المراحل 1-10 مجانية' : 'Levels 1-10 Free',
+                              style: const TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.workspace_premium, color: Color(0xFFFFD54F), size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              isAr ? 'المراحل 11-20 للمحترفين VIP' : 'Levels 11-20 VIP Pro',
+                              style: const TextStyle(color: Color(0xFFFFD54F), fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

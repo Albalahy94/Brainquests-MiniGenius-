@@ -347,21 +347,25 @@ class _JigsawPuzzleGameScreenState extends State<JigsawPuzzleGameScreen> {
                         ],
                       ),
                     ),
-                    ElevatedButton.icon(
-                      onPressed: _showImagePreviewDialog,
-                      icon: const Icon(Icons.remove_red_eye_rounded, size: 16),
-                      label: Text(
-                        isAr ? 'معاينة الصورة' : 'Preview',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: const BorderSide(color: Colors.white30),
+                    const SizedBox(width: 8),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: ElevatedButton.icon(
+                        onPressed: _showImagePreviewDialog,
+                        icon: const Icon(Icons.remove_red_eye_rounded, size: 16),
+                        label: Text(
+                          isAr ? 'معاينة الصورة' : 'Preview',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: Colors.white30),
+                          ),
                         ),
                       ),
                     ),

@@ -55,40 +55,43 @@ class _GameCardState extends State<GameCard> {
             ),
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: widget.game.color.withOpacity(0.2),
-                      shape: BoxShape.circle,
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: widget.game.color.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(widget.game.icon, size: 28, color: widget.game.color),
                     ),
-                    child: Icon(widget.game.icon, size: 30, color: widget.game.color),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    widget.game.name,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.game.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    widget.game.description,
-                    style: theme.textTheme.bodySmall?.copyWith(fontSize: 10, height: 1.2),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.game.description,
+                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 10, height: 1.2),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

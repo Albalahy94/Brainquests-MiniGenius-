@@ -18,6 +18,7 @@ class SettingsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final appState = context.watch<AppStateProvider>();
     final theme = Theme.of(context);
+    final isAr = appState.locale.languageCode == 'ar';
 
     return Scaffold(
       appBar: AppBar(
@@ -26,11 +27,11 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          _buildSectionHeader(context, 'Brainquests Pro 👑'),
+          _buildSectionHeader(context, isAr ? 'عضوية Brainquests Pro 👑' : 'Brainquests Pro 👑'),
           ListTile(
             leading: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFFB300), size: 28),
-            title: const Text('ترقية الحساب / إدارة الاشتراك', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('فتح +100 مستوى ورادار الذكاء المعرفي وثيمات الألعاب'),
+            title: Text(isAr ? 'ترقية الحساب / إدارة الاشتراك' : 'Upgrade to Pro / Manage Subscription', style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(isAr ? 'فتح +100 مستوى ورادار الذكاء المعرفي وثيمات الألعاب' : 'Unlock +100 levels, Cognitive Radar & game themes'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () async {
               final isParent = await showParentalGateDialog(context);
@@ -41,8 +42,8 @@ class SettingsScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.vpn_key_rounded, color: AppTheme.primaryBlue, size: 26),
-            title: const Text('تفعيل كود ترقية VIP', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('إدخال كود الترخيص الصادر من بوابة البلحي أو الدعم الفني'),
+            title: Text(isAr ? 'تفعيل كود ترقية VIP' : 'Redeem VIP Promo Code', style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(isAr ? 'إدخال كود الترخيص الصادر من بوابة البلحي أو الدعم الفني' : 'Enter license key from Albalahy Portal or support'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () async {
               final isParent = await showParentalGateDialog(context);
@@ -53,8 +54,8 @@ class SettingsScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.account_circle_outlined, color: Colors.teal, size: 26),
-            title: const Text('حساب ولي الأمر (Parent Account)', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('ربط الهاتف بالبورتال، حفظ الاشتراكات، ومزامنة VIP'),
+            title: Text(isAr ? 'حساب ولي الأمر' : 'Parent Account', style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(isAr ? 'ربط الهاتف بالبورتال، حفظ الاشتراكات، ومزامنة VIP' : 'Link device to portal, manage subscriptions, and sync VIP'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () async {
               final isParent = await showParentalGateDialog(context);
@@ -160,24 +161,32 @@ class SettingsScreen extends StatelessWidget {
               ),
               child: const Icon(Icons.chat_rounded, color: Colors.white, size: 20),
             ),
-            title: const Text(
-              'الدعم الفني المباشر (WhatsApp)',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            title: Text(
+              isAr ? 'الدعم الفني المباشر (WhatsApp)' : 'Direct Support (WhatsApp)',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: const Text('+20 106 748 1561 - متاح للمساعدة الفورية وتفعيل الاشتراكات'),
+            subtitle: Text(
+              isAr
+                  ? '+20 106 748 1561 - متاح للمساعدة الفورية وتفعيل الاشتراكات'
+                  : '+20 106 748 1561 - Available for instant support & activation',
+            ),
             trailing: const Icon(Icons.open_in_new, size: 16, color: Color(0xFF25D366)),
             onTap: () async {
               final isParent = await showParentalGateDialog(context);
               if (isParent && context.mounted) {
                 final Uri waUri = Uri.parse(
-                  'https://wa.me/201067481561?text=${Uri.encodeComponent("مرحباً، أطلب الدعم الفني لتطبيق Brainquests v2")}',
+                  'https://wa.me/201067481561?text=${Uri.encodeComponent(isAr ? "مرحباً، أطلب الدعم الفني لتطبيق Brainquests v2" : "Hello, I need support for Brainquests v2")}',
                 );
                 try {
                   await launchUrl(waUri, mode: LaunchMode.externalApplication);
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('تعذر فتح واتساب، يرجى التواصل على الرقم: 01067481561'),
+                    SnackBar(
+                      content: Text(
+                        isAr
+                            ? 'تعذر فتح واتساب، يرجى التواصل على الرقم: 01067481561'
+                            : 'Could not open WhatsApp, please contact +20 106 748 1561',
+                      ),
                     ),
                   );
                 }
