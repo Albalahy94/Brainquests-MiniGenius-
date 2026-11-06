@@ -4,11 +4,10 @@ import 'package:minigenius/generated/l10n/app_localizations.dart';
 
 /// Apple Kids Category Parental Gate
 /// Shows a simple math question that children cannot easily solve.
-/// Required before accessing any external links (e.g. Contact Developer).
 Future<bool> showParentalGateDialog(BuildContext context) async {
   final result = await showDialog<bool>(
     context: context,
-    barrierDismissible: false,
+    barrierDismissible: true,
     builder: (context) => const _ParentalGateDialog(),
   );
   return result ?? false;
@@ -37,12 +36,11 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
 
   void _generateQuestion() {
     final rng = Random();
-    // Use numbers 7-12 for multiplication — hard for young children but easy for parents
+    // Use numbers 7-12 for multiplication
     _num1 = rng.nextInt(6) + 7; // 7 to 12
     _num2 = rng.nextInt(6) + 7; // 7 to 12
     _correctAnswer = _num1 * _num2;
 
-    // Generate 3 wrong options that are close but distinct
     final wrongOptions = <int>{};
     while (wrongOptions.length < 3) {
       final offset = rng.nextInt(10) + 1;
@@ -72,7 +70,6 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
     if (_selectedAnswer == _correctAnswer) {
       Navigator.of(context).pop(true);
     } else {
-      // Wrong answer — regenerate question
       setState(() {
         _showError = true;
       });
@@ -88,8 +85,17 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
+    final title = l10n?.parentalGateTitle ?? (isAr ? 'التحقق من هوية الوالد' : 'Parent Verification');
+    final desc = l10n?.parentalGateDescription ?? (isAr
+        ? 'للأمان، يرجى حل العملية الحسابية البسيطة للمتابعة:'
+        : 'For safety, please solve this math problem to continue:');
+    final wrongText = l10n?.parentalGateWrongAnswer ?? (isAr ? 'إجابة خاطئة، يرجى المحاولة ثانية' : 'Incorrect answer, please try again');
+    final cancelText = l10n?.cancel ?? (isAr ? 'إلغاء' : 'Cancel');
+    final continueText = l10n?.parentalGateContinue ?? (isAr ? 'متابعة' : 'Continue');
 
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -99,7 +105,7 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              l10n.parentalGateTitle,
+              title,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -111,116 +117,129 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-          Text(
-            l10n.parentalGateDescription,
-            style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-
-          // Math question
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              '$_num1 × $_num2 = ?',
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onPrimaryContainer,
-                letterSpacing: 2,
-              ),
+            Text(
+              desc,
+              style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
               textAlign: TextAlign.center,
-              textDirection: TextDirection.ltr,
             ),
-          ),
+            const SizedBox(height: 20),
 
-          const SizedBox(height: 20),
-
-          // Answer options grid
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 2.5,
-            physics: const NeverScrollableScrollPhysics(),
-            children: _options.map((option) {
-              final isSelected = _selectedAnswer == option;
-              final isWrong = _showError && isSelected;
-
-              return GestureDetector(
-                onTap: () => _onOptionSelected(option),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  decoration: BoxDecoration(
-                    color: isWrong
-                        ? Colors.red.shade100
-                        : isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isWrong
-                          ? Colors.red
-                          : isSelected
-                              ? theme.colorScheme.primary
-                              : Colors.transparent,
-                      width: 2,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '$option',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isWrong
-                            ? Colors.red
-                            : isSelected
-                                ? theme.colorScheme.onPrimary
-                                : theme.colorScheme.onSurface,
-                      ),
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
+            // Math question box
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                '$_num1 × $_num2 = ?',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                  letterSpacing: 2,
                 ),
-              );
-            }).toList(),
-          ),
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.ltr,
+              ),
+            ),
 
-          // Error message
-          if (_showError) ...[
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            const SizedBox(height: 16),
+
+            // Answer options in 2 rows
+            Column(
               children: [
-                const Icon(Icons.close_rounded, color: Colors.red, size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  l10n.parentalGateWrongAnswer,
-                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                Row(
+                  children: [
+                    Expanded(child: _buildOptionButton(_options[0], theme)),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildOptionButton(_options[1], theme)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(child: _buildOptionButton(_options[2], theme)),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildOptionButton(_options[3], theme)),
+                  ],
                 ),
               ],
             ),
+
+            if (_showError) ...[
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.close_rounded, color: Colors.red, size: 18),
+                  const SizedBox(width: 6),
+                  Text(
+                    wrongText,
+                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
-    ),
-    actions: [
+      actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(l10n.cancel),
+          child: Text(cancelText),
         ),
         ElevatedButton(
           onPressed: _selectedAnswer != null && !_showError ? _onConfirm : null,
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          child: Text(l10n.parentalGateContinue),
+          child: Text(continueText),
         ),
       ],
+    );
+  }
+
+  Widget _buildOptionButton(int option, ThemeData theme) {
+    final isSelected = _selectedAnswer == option;
+    final isWrong = _showError && isSelected;
+
+    return GestureDetector(
+      onTap: () => _onOptionSelected(option),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isWrong
+              ? Colors.red.shade100
+              : isSelected
+                  ? theme.colorScheme.primary
+                  : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isWrong
+                ? Colors.red
+                : isSelected
+                    ? theme.colorScheme.primary
+                    : Colors.grey.shade300,
+            width: 2,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            '$option',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isWrong
+                  ? Colors.red
+                  : isSelected
+                      ? Colors.white
+                      : Colors.black87,
+            ),
+            textDirection: TextDirection.ltr,
+          ),
+        ),
+      ),
     );
   }
 }
