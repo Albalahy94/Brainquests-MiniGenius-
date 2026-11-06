@@ -80,3 +80,4 @@ class _ScreenTimeWatcherState extends State<ScreenTimeWatcher>
     return widget.child;
   }
 }
+

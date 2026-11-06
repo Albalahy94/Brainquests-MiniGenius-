@@ -90,7 +90,6 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -108,9 +107,10 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
           ),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           Text(
             l10n.parentalGateDescription,
             style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
@@ -207,7 +207,8 @@ class _ParentalGateDialogState extends State<_ParentalGateDialog> {
           ],
         ],
       ),
-      actions: [
+    ),
+    actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
           child: Text(l10n.cancel),

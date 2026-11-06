@@ -31,132 +31,148 @@ class ScreenTimeLockedScreen extends StatelessWidget {
             ),
           ),
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Spacer(),
 
-                  // Bedtime / Sleeping Moon Visual
-                  Container(
-                    width: 130,
-                    height: 130,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          Colors.amber.withOpacity(0.35),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.amber.shade200,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.amber.withOpacity(0.5),
-                              blurRadius: 25,
-                              spreadRadius: 4,
+                            // Bedtime / Sleeping Moon Visual
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(
+                                  colors: [
+                                    Colors.amber.withOpacity(0.35),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 84,
+                                  height: 84,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.amber.shade200,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.amber.withOpacity(0.5),
+                                        blurRadius: 25,
+                                        spreadRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.bedtime_rounded,
+                                    size: 48,
+                                    color: Color(0xFFD97706),
+                                  ),
+                                ),
+                              ),
                             ),
+
+                            const SizedBox(height: 20),
+
+                            // Child Name Badge
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.25),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.face_rounded,
+                                      color: Colors.amberAccent, size: 20),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      child.name,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            // Gentle Kid-Friendly Title
+                            const Text(
+                              'انتهى وقت اللعب اليوم يا بطل! 🌙',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                height: 1.3,
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // Warm Caring Subtitle
+                            Text(
+                              'أحسنت يا ${child.name}! لقد تعلمت واستمتعت كثيراً اليوم.\nحان وقت أخذ راحة لعينيك الجميلتين واللعب مع عائلتك أو النوم بسلام ✨',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.85),
+                                fontSize: 14,
+                                height: 1.5,
+                              ),
+                            ),
+
+                            const Spacer(),
+                            const SizedBox(height: 20),
+
+                            // Parent Unlock Action Button
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.white70,
+                                side: BorderSide(color: Colors.white.withOpacity(0.3)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                              ),
+                              icon: const Icon(Icons.vpn_key_rounded, size: 18),
+                              label: const Text(
+                                'أنا ولي الأمر (إدارة الوقت)',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              onPressed: () => _handleParentUnlock(context),
+                            ),
+
+                            const SizedBox(height: 12),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.bedtime_rounded,
-                          size: 52,
-                          color: Color(0xFFD97706),
-                        ),
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Child Name Badge
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.25),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.face_rounded,
-                            color: Colors.amberAccent, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          child.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Gentle Kid-Friendly Title
-                  const Text(
-                    'انتهى وقت اللعب اليوم يا بطل! 🌙',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      height: 1.3,
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  // Warm Caring Subtitle
-                  Text(
-                    'أحسنت يا ${child.name}! لقد تعلمت واستمتعت كثيراً اليوم.\nحان وقت أخذ راحة لعينيك الجميلتين واللعب مع عائلتك أو النوم بسلام ✨',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.85),
-                      fontSize: 15,
-                      height: 1.5,
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Parent Unlock Action Button
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white70,
-                      side: BorderSide(color: Colors.white.withOpacity(0.3)),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    icon: const Icon(Icons.vpn_key_rounded, size: 18),
-                    label: const Text(
-                      'أنا ولي الأمر (إدارة الوقت)',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    onPressed: () => _handleParentUnlock(context),
-                  ),
-
-                  const SizedBox(height: 12),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ),

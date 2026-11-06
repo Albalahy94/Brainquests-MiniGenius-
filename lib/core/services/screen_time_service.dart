@@ -179,3 +179,4 @@ class ScreenTimeService extends ChangeNotifier {
     }
   }
 }
+

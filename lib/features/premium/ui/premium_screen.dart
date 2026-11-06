@@ -403,42 +403,45 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       const SizedBox(height: 8),
 
                       // Privacy Policy & Terms of Use links (Apple Guideline 3.1.2)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, AppRoutes.privacyPolicy);
-                            },
-                            child: Text(
-                              isAr ? 'سياسة الخصوصية' : 'Privacy Policy',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 12,
-                                decoration: TextDecoration.underline,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, AppRoutes.privacyPolicy);
+                              },
+                              child: Text(
+                                isAr ? 'سياسة الخصوصية' : 'Privacy Policy',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontSize: 12,
+                                  decoration: TextDecoration.underline,
+                                ),
                               ),
                             ),
-                          ),
-                          const Text(' • ', style: TextStyle(color: Colors.white38)),
-                          TextButton(
-                            onPressed: () async {
-                              final Uri eulaUri = Uri.parse(
-                                'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
-                              );
-                              try {
-                                await launchUrl(eulaUri, mode: LaunchMode.externalApplication);
-                              } catch (_) {}
-                            },
-                            child: Text(
-                              isAr ? 'شروط الاستخدام (EULA)' : 'Terms of Use (EULA)',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 12,
-                                decoration: TextDecoration.underline,
+                            const Text(' • ', style: TextStyle(color: Colors.white38)),
+                            TextButton(
+                              onPressed: () async {
+                                final Uri eulaUri = Uri.parse(
+                                  'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                                );
+                                try {
+                                  await launchUrl(eulaUri, mode: LaunchMode.externalApplication);
+                                } catch (_) {}
+                              },
+                              child: Text(
+                                isAr ? 'شروط الاستخدام (EULA)' : 'Terms of Use (EULA)',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontSize: 12,
+                                  decoration: TextDecoration.underline,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 12),
                     ],

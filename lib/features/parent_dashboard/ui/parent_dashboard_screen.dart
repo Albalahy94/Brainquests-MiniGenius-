@@ -304,13 +304,16 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
-                      child: Text(
-                        'لوحة تحكم الوالدين',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'لوحة تحكم الوالدين',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
                       ),
                     ),
                     IconButton(
@@ -917,11 +920,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           children: [
                             Row(
                               children: [
-                                Text(
-                                  c.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                Flexible(
+                                  child: Text(
+                                    c.name,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 6),
