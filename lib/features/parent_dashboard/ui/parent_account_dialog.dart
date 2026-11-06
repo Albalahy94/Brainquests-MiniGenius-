@@ -66,7 +66,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
     });
   }
 
-  void _generateSuggestedPassword() {
+  void _generateSuggestedPassword(bool isAr) {
     final adjectives = ['Hero', 'Super', 'Smart', 'Safe', 'Star', 'Bright'];
     final numbers = Random().nextInt(900) + 100;
     final symbols = ['@', '#', '!', '*'];
@@ -79,7 +79,11 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('تم توليد كلمة مرور قوية ونسخها: $suggested'),
+        content: Text(
+          isAr
+              ? 'تم توليد كلمة مرور قوية ونسخها: $suggested'
+              : 'Strong password generated and copied: $suggested',
+        ),
         backgroundColor: Colors.teal,
         duration: const Duration(seconds: 3),
       ),
@@ -87,7 +91,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
     setState(() {});
   }
 
-  Future<void> _handleSubmit() async {
+  Future<void> _handleSubmit(bool isAr) async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSubmitting = true);
@@ -107,7 +111,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
       if (res['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res['message'] ?? 'تم إنشاء الحساب بنجاح!'),
+            content: Text(res['message'] ?? (isAr ? 'تم إنشاء الحساب بنجاح!' : 'Account created successfully!')),
             backgroundColor: Colors.green,
           ),
         );
@@ -116,7 +120,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res['message'] ?? 'فشل إنشاء الحساب'),
+            content: Text(res['message'] ?? (isAr ? 'فشل إنشاء الحساب' : 'Failed to create account')),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -134,7 +138,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
       if (res['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res['message'] ?? 'تم تسجيل الدخول بنجاح!'),
+            content: Text(res['message'] ?? (isAr ? 'تم تسجيل الدخول بنجاح!' : 'Signed in successfully!')),
             backgroundColor: Colors.green,
           ),
         );
@@ -143,7 +147,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res['message'] ?? 'فشل تسجيل الدخول'),
+            content: Text(res['message'] ?? (isAr ? 'فشل تسجيل الدخول' : 'Failed to sign in')),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -157,7 +161,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
     _loadProfile();
   }
 
-  Future<void> _handleSyncLicense() async {
+  Future<void> _handleSyncLicense(bool isAr) async {
     setState(() => _isSubmitting = true);
     final res = await _licensingService.verifyLicense();
     setState(() => _isSubmitting = false);
@@ -171,8 +175,8 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(isPro
-            ? '✅ تم تحديث الترخيص: حسابك مفعل باقة VIP بنجاح!'
-            : 'ℹ️ تم المزامنة بنجاح مع السيرفر المركزي.'),
+            ? (isAr ? '✅ تم تحديث الترخيص: حسابك مفعل باقة VIP بنجاح!' : '✅ License updated: VIP Pro active!')
+            : (isAr ? 'ℹ️ تم المزامنة بنجاح مع السيرفر المركزي.' : 'ℹ️ Synchronized with central server.')),
         backgroundColor: isPro ? Colors.green : Colors.blueGrey,
       ),
     );
@@ -181,6 +185,8 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       elevation: 16,
@@ -205,13 +211,13 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
                 child: CircularProgressIndicator(),
               )
             : SingleChildScrollView(
-                child: _isLoggedIn ? _buildProfileView() : _buildAuthForm(),
+                child: _isLoggedIn ? _buildProfileView(isAr) : _buildAuthForm(isAr),
               ),
       ),
     );
   }
 
-  Widget _buildProfileView() {
+  Widget _buildProfileView(bool isAr) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -226,7 +232,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
             Row(
               children: [
                 Text(
-                  'ملف ولي الأمر',
+                  isAr ? 'ملف ولي الأمر' : 'Parent Profile',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppTheme.primaryBlue,
@@ -266,7 +272,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
               ),
               const SizedBox(height: 12),
               Text(
-                _profile['name'] ?? 'ولي الأمر',
+                _profile['name'] ?? (isAr ? 'ولي الأمر' : 'Parent'),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -309,24 +315,24 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
             children: [
               IconButton(
                 icon: const Icon(Icons.copy_rounded, size: 18),
-                tooltip: 'نسخ معرف الجهاز',
+                tooltip: isAr ? 'نسخ معرف الجهاز' : 'Copy Device ID',
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: _deviceId));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('تم نسخ معرف الجهاز إلى الحافظة'),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      content: Text(isAr ? 'تم نسخ معرف الجهاز إلى الحافظة' : 'Device ID copied to clipboard'),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },
               ),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'معرف الجهاز المرتبط (Device ID)',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                    Text(
+                      isAr ? 'معرف الجهاز المرتبط (Device ID)' : 'Linked Device ID',
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
                     ),
                     Text(
                       _deviceId,
@@ -347,7 +353,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
         ),
         const SizedBox(height: 20),
         ElevatedButton.icon(
-          onPressed: _isSubmitting ? null : _handleSyncLicense,
+          onPressed: _isSubmitting ? null : () => _handleSyncLicense(isAr),
           icon: _isSubmitting
               ? const SizedBox(
                   width: 18,
@@ -355,7 +361,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                 )
               : const Icon(Icons.sync_rounded),
-          label: const Text('مزامنة حالة اشتراك VIP الآن'),
+          label: Text(isAr ? 'مزامنة حالة اشتراك VIP الآن' : 'Sync VIP Status Now'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.teal,
             foregroundColor: Colors.white,
@@ -367,9 +373,9 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
         OutlinedButton.icon(
           onPressed: _handleLogout,
           icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
-          label: const Text(
-            'تسجيل الخروج من الحساب',
-            style: TextStyle(color: Colors.redAccent),
+          label: Text(
+            isAr ? 'تسجيل الخروج من الحساب' : 'Sign Out',
+            style: const TextStyle(color: Colors.redAccent),
           ),
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Colors.redAccent),
@@ -381,7 +387,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
     );
   }
 
-  Widget _buildAuthForm() {
+  Widget _buildAuthForm(bool isAr) {
     return Form(
       key: _formKey,
       child: Column(
@@ -395,26 +401,38 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
                 icon: const Icon(Icons.close),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              Row(
-                children: [
-                  Text(
-                    _isRegisterMode ? 'إنشاء حساب ولي الأمر' : 'تسجيل دخول ولي الأمر',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryBlue,
-                        ),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Text(
+                        _isRegisterMode
+                            ? (isAr ? 'إنشاء حساب ولي الأمر' : 'Create Parent Account')
+                            : (isAr ? 'تسجيل دخول ولي الأمر' : 'Parent Login'),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryBlue,
+                            ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.family_restroom_rounded, color: AppTheme.primaryBlue),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.family_restroom_rounded, color: AppTheme.primaryBlue),
-                ],
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
             _isRegisterMode
-                ? 'قم بإنشاء حساب لحفظ اشتراكات طفلك، مزامنة تراخيص VIP، وربطها بهاتفك.'
-                : 'أهلاً بك مجدداً! سجّل دخولك لمزامنة اشتراكات طفلك وتراخيص الـ VIP.',
+                ? (isAr
+                    ? 'قم بإنشاء حساب لحفظ اشتراكات طفلك، مزامنة تراخيص VIP، وربطها بهاتفك.'
+                    : 'Create an account to save subscriptions, sync VIP licenses, and link to your phone.')
+                : (isAr
+                    ? 'أهلاً بك مجدداً! سجّل دخولك لمزامنة اشتراكات طفلك وتراخيص الـ VIP.'
+                    : 'Welcome back! Sign in to sync your child\'s subscriptions and VIP licenses.'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
           ),
@@ -447,7 +465,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        'حساب جديد',
+                        isAr ? 'حساب جديد' : 'New Account',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight:
@@ -479,7 +497,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        'تسجيل الدخول',
+                        isAr ? 'تسجيل الدخول' : 'Sign In',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight:
@@ -499,18 +517,22 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
           if (_isRegisterMode) ...[
             TextFormField(
               controller: _nameController,
-              textAlign: TextAlign.right,
+              textAlign: isAr ? TextAlign.right : TextAlign.left,
               decoration: InputDecoration(
-                labelText: 'الاسم ثلاثي لولي الأمر *',
-                hintText: 'مثال: أحمد عبد الله المحمدي',
+                labelText: isAr ? 'الاسم ثلاثي لولي الأمر *' : 'Parent Full Name *',
+                hintText: isAr ? 'مثال: أحمد عبد الله المحمدي' : 'e.g., John Smith',
                 prefixIcon: const Icon(Icons.person_outline),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'يرجى إدخال اسم ولي الأمر';
+                if (v == null || v.trim().isEmpty) {
+                  return isAr ? 'يرجى إدخال اسم ولي الأمر' : 'Please enter parent name';
+                }
                 final words = v.trim().split(RegExp(r'\s+'));
-                if (words.length < 2) return 'يرجى كتابة الاسم ثنائياً أو ثلاثياً على الأقل';
+                if (words.length < 2) {
+                  return isAr ? 'يرجى كتابة الاسم ثنائياً أو ثلاثياً على الأقل' : 'Please enter first and last name';
+                }
                 return null;
               },
             ),
@@ -518,17 +540,21 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
             TextFormField(
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              textAlign: TextAlign.right,
+              textAlign: isAr ? TextAlign.right : TextAlign.left,
               decoration: InputDecoration(
-                labelText: 'رقم هاتف الواتساب (للتواصل وتأكيد VIP) *',
-                hintText: '01012345678',
+                labelText: isAr ? 'رقم هاتف الواتساب (للتواصل وتأكيد VIP) *' : 'WhatsApp Phone *',
+                hintText: isAr ? '01012345678' : '+1 555-1234',
                 prefixIcon: const Icon(Icons.chat_bubble_outline, color: Colors.teal),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'يرجى إدخال رقم الواتساب';
-                if (v.trim().length < 8) return 'رقم الهاتف غير صالح';
+                if (v == null || v.trim().isEmpty) {
+                  return isAr ? 'يرجى إدخال رقم الواتساب' : 'Please enter phone number';
+                }
+                if (v.trim().length < 8) {
+                  return isAr ? 'رقم الهاتف غير صالح' : 'Invalid phone number';
+                }
                 return null;
               },
             ),
@@ -537,17 +563,23 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            textAlign: TextAlign.right,
+            textAlign: isAr ? TextAlign.right : TextAlign.left,
             decoration: InputDecoration(
-              labelText: _isRegisterMode ? 'البريد الإلكتروني *' : 'البريد الإلكتروني أو اسم المستخدم *',
+              labelText: _isRegisterMode
+                  ? (isAr ? 'البريد الإلكتروني *' : 'Email Address *')
+                  : (isAr ? 'البريد الإلكتروني أو اسم المستخدم *' : 'Email or Username *'),
               hintText: 'parent@example.com',
               prefixIcon: const Icon(Icons.email_outlined),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'يرجى إدخال البريد الإلكتروني';
-              if (_isRegisterMode && !v.contains('@')) return 'صيغة البريد الإلكتروني غير صحيحة';
+              if (v == null || v.trim().isEmpty) {
+                return isAr ? 'يرجى إدخال البريد الإلكتروني' : 'Please enter email';
+              }
+              if (_isRegisterMode && !v.contains('@')) {
+                return isAr ? 'صيغة البريد الإلكتروني غير صحيحة' : 'Invalid email format';
+              }
               return null;
             },
           ),
@@ -555,9 +587,9 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
           TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
-            textAlign: TextAlign.right,
+            textAlign: isAr ? TextAlign.right : TextAlign.left,
             decoration: InputDecoration(
-              labelText: 'كلمة المرور *',
+              labelText: isAr ? 'كلمة المرور *' : 'Password *',
               prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
@@ -567,28 +599,32 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return 'يرجى إدخال كلمة المرور';
-              if (v.length < 6) return 'كلمة المرور يجب ألا تقل عن 6 خانات';
+              if (v == null || v.isEmpty) {
+                return isAr ? 'يرجى إدخال كلمة المرور' : 'Please enter password';
+              }
+              if (v.length < 6) {
+                return isAr ? 'كلمة المرور يجب ألا تقل عن 6 خانات' : 'Password must be at least 6 characters';
+              }
               return null;
             },
           ),
           if (_isRegisterMode) ...[
             const SizedBox(height: 8),
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
               child: TextButton.icon(
-                onPressed: _generateSuggestedPassword,
+                onPressed: () => _generateSuggestedPassword(isAr),
                 icon: const Icon(Icons.auto_awesome, size: 16, color: Colors.teal),
-                label: const Text(
-                  'اقتراح كلمة مرور قوية وسهلة',
-                  style: TextStyle(fontSize: 12, color: Colors.teal, fontWeight: FontWeight.bold),
+                label: Text(
+                  isAr ? 'اقتراح كلمة مرور قوية وسهلة' : 'Suggest strong password',
+                  style: const TextStyle(fontSize: 12, color: Colors.teal, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
           ],
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: _isSubmitting ? null : _handleSubmit,
+            onPressed: _isSubmitting ? null : () => _handleSubmit(isAr),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryBlue,
               foregroundColor: Colors.white,
@@ -602,7 +638,9 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
                 : Text(
-                    _isRegisterMode ? 'إنشاء الحساب وتأكيد الربط' : 'تسجيل الدخول ومزامنة VIP',
+                    _isRegisterMode
+                        ? (isAr ? 'إنشاء الحساب وتأكيد الربط' : 'Create Account & Link Device')
+                        : (isAr ? 'تسجيل الدخول ومزامنة VIP' : 'Sign In & Sync VIP'),
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
           ),
