@@ -15,6 +15,8 @@ import '../../../core/services/vip_service.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/widgets/parental_gate_dialog.dart';
 import '../../../core/services/licensing_api_service.dart';
+import '../../../core/services/screen_time_service.dart';
+import '../../../core/models/child_profile.dart';
 import 'parent_account_dialog.dart';
 import 'dart:math';
 
@@ -37,11 +39,26 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    ScreenTimeService().addListener(_onScreenTimeUpdate);
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    ScreenTimeService().removeListener(_onScreenTimeUpdate);
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _onScreenTimeUpdate() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadData() async {
     await _storageService.init();
+    await ScreenTimeService().initialize();
     final profile = await LicensingApiService().getParentProfile();
     setState(() {
       _settings = _parentService.getSettings();
@@ -326,15 +343,20 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       _buildParentAccountBanner(),
                       const SizedBox(height: 16),
 
-                      // Today's Play Time
+                      // Children Profiles & Screen Time Management Section
+                      _buildChildrenProfilesSection(),
+                      const SizedBox(height: 16),
+
+                      // Today's Play Time for Active Child
                       _StatCard(
-                        title: 'وقت اللعب اليوم',
-                        value: '${_parentService.getTodayPlayTime()} دقيقة',
+                        title: 'وقت لعب (${ScreenTimeService().activeChild.name}) اليوم',
+                        value: '${(ScreenTimeService().activeChild.secondsUsedToday / 60).floor()} دقيقة',
                         icon: Icons.access_time,
                         color: Colors.blue,
-                        subtitle: _settings!.dailyPlayTimeLimit != null
-                            ? 'الحد الأقصى: ${_settings!.dailyPlayTimeLimit} دقيقة'
-                            : 'لا يوجد حد',
+                        subtitle: ScreenTimeService().activeChild.isScreenTimeEnabled &&
+                                ScreenTimeService().activeChild.dailyLimitMinutes > 0
+                            ? 'المحدد: ${ScreenTimeService().activeChild.dailyLimitMinutes} دقيقة (المتبقي: ${ScreenTimeService().activeChild.remainingMinutes >= 0 ? "${ScreenTimeService().activeChild.remainingMinutes} دقيقة" : "مفتوح"})'
+                            : 'لا يوجد حد زمني (مفتوح)',
                       ),
 
                       const SizedBox(height: 16),
@@ -559,12 +581,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             ListTile(
                               title: const Text('حد وقت اللعب اليومي'),
                               subtitle: Text(
-                                _settings!.dailyPlayTimeLimit != null
-                                    ? '${_settings!.dailyPlayTimeLimit} دقيقة'
-                                    : 'غير محدد',
+                                ScreenTimeService().activeChild.isScreenTimeEnabled &&
+                                        ScreenTimeService().activeChild.dailyLimitMinutes > 0
+                                    ? '${ScreenTimeService().activeChild.dailyLimitMinutes} دقيقة لـ (${ScreenTimeService().activeChild.name})'
+                                    : 'غير محدد (مفتوح)',
                               ),
                               trailing: const Icon(Icons.arrow_forward_ios),
-                              onTap: () => _showTimeLimitDialog(),
+                              onTap: () => _showAddOrEditChildDialog(
+                                  child: ScreenTimeService().activeChild),
                             ),
                             ListTile(
                               title: const Text('الألعاب المسموحة'),
@@ -780,6 +804,446 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
+  Widget _buildChildrenProfilesSection() {
+    final screenTime = ScreenTimeService();
+    final children = screenTime.children;
+    final activeChild = screenTime.activeChild;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.family_restroom_rounded,
+                  color: AppTheme.primaryBlue, size: 24),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'أطفالي وتحديد وقت اللعب ⏳',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.add, size: 16),
+                label: const Text(
+                  'إضافة طفل',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+                onPressed: () => _showAddOrEditChildDialog(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'خصص وقتاً مستقلاً لكل طفل (من ربع ساعة فما فوق). الطفل المفعّل هو من سيطبق عليه المؤقت عند استخدام التطبيق:',
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 14),
+
+          // List of children cards
+          ...children.map((c) {
+            final isActive = c.id == activeChild.id;
+            final usedMins = (c.secondsUsedToday / 60).floor();
+            final limitMins = c.dailyLimitMinutes;
+            final progress = (c.isScreenTimeEnabled && limitMins > 0)
+                ? (usedMins / limitMins).clamp(0.0, 1.0)
+                : 0.0;
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isActive
+                    ? AppTheme.primaryBlue.withValues(alpha: 0.05)
+                    : Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isActive
+                      ? AppTheme.primaryBlue.withValues(alpha: 0.5)
+                      : Colors.grey.shade200,
+                  width: isActive ? 1.5 : 1.0,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      // Avatar circle
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: isActive
+                            ? AppTheme.primaryBlue
+                            : Colors.grey.shade300,
+                        child: Text(
+                          c.name.isNotEmpty ? c.name[0] : '؟',
+                          style: TextStyle(
+                            color: isActive ? Colors.white : Colors.black87,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  c.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade100,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    '${c.age} سنوات',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.amber.shade900,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              c.isScreenTimeEnabled && limitMins > 0
+                                  ? 'المحدد: $limitMins دقيقة (المتبقي: ${c.remainingMinutes >= 0 ? "${c.remainingMinutes} دقيقة" : "مفتوح"})'
+                                  : 'وقت اللعب غير مقيد (مفتوح)',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: c.isLimitReached
+                                    ? Colors.red
+                                    : Colors.grey.shade700,
+                                fontWeight: c.isLimitReached
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Edit button
+                      IconButton(
+                        icon: const Icon(Icons.tune_rounded, size: 20),
+                        tooltip: 'تخصيص الوقت',
+                        color: Colors.grey.shade700,
+                        onPressed: () => _showAddOrEditChildDialog(child: c),
+                      ),
+                    ],
+                  ),
+
+                  // Progress bar if screen time enabled
+                  if (c.isScreenTimeEnabled && limitMins > 0) ...[
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 5,
+                        backgroundColor: Colors.grey.shade200,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          c.isLimitReached
+                              ? Colors.red
+                              : (progress > 0.8 ? Colors.orange : Colors.green),
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 8),
+                  // Active selection row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (isActive)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.check_circle,
+                                  color: Colors.green, size: 14),
+                              const SizedBox(width: 4),
+                              Text(
+                                'يلعب على الجهاز الآن',
+                                style: TextStyle(
+                                  color: Colors.green.shade900,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppTheme.primaryBlue,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                          ),
+                          icon: const Icon(Icons.play_circle_outline, size: 16),
+                          label: const Text('تفعيل للعب الآن',
+                              style: TextStyle(fontSize: 12)),
+                          onPressed: () async {
+                            await screenTime.setActiveChild(c.id);
+                            setState(() {});
+                          },
+                        ),
+
+                      if (children.length > 1)
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.red.shade400,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                          ),
+                          child:
+                              const Text('حذف', style: TextStyle(fontSize: 11)),
+                          onPressed: () => _confirmDeleteChild(c),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  void _showAddOrEditChildDialog({ChildProfile? child}) {
+    final isEditing = child != null;
+    final nameController =
+        TextEditingController(text: isEditing ? child.name : '');
+    int selectedAge = isEditing ? child.age : 6;
+    bool isEnabled = isEditing ? child.isScreenTimeEnabled : true;
+    int selectedLimit = isEditing ? child.dailyLimitMinutes : 30;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(isEditing ? 'تخصيص وقت الطفل' : 'إضافة طفل جديد'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'اسم الطفل',
+                    hintText: 'مثال: أحمد أو سارة',
+                    prefixIcon: Icon(Icons.child_care),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    const Text('العمر:',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 12),
+                    DropdownButton<int>(
+                      value: selectedAge,
+                      items: List.generate(
+                        10,
+                        (index) => DropdownMenuItem(
+                          value: index + 3,
+                          child: Text('${index + 3} سنوات'),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedAge = val);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                const Divider(height: 24),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('تفعيل التحكم في وقت اللعب',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14)),
+                  subtitle: const Text('إغلاق التطبيق بعد انتهاء الوقت المخصص',
+                      style: TextStyle(fontSize: 12)),
+                  value: isEnabled,
+                  onChanged: (val) {
+                    setDialogState(() => isEnabled = val);
+                  },
+                ),
+                if (isEnabled) ...[
+                  const SizedBox(height: 10),
+                  const Text('الحد اليومي للعب:',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      _buildLimitChip(
+                          '15 دقيقة (ربع ساعة)', 15, selectedLimit, (val) {
+                        setDialogState(() => selectedLimit = val);
+                      }),
+                      _buildLimitChip(
+                          '30 دقيقة (نصف ساعة)', 30, selectedLimit, (val) {
+                        setDialogState(() => selectedLimit = val);
+                      }),
+                      _buildLimitChip('45 دقيقة', 45, selectedLimit, (val) {
+                        setDialogState(() => selectedLimit = val);
+                      }),
+                      _buildLimitChip(
+                          '60 دقيقة (ساعة)', 60, selectedLimit, (val) {
+                        setDialogState(() => selectedLimit = val);
+                      }),
+                      _buildLimitChip(
+                          '90 دقيقة (ساعة ونصف)', 90, selectedLimit, (val) {
+                        setDialogState(() => selectedLimit = val);
+                      }),
+                      _buildLimitChip(
+                          '120 دقيقة (ساعتان)', 120, selectedLimit, (val) {
+                        setDialogState(() => selectedLimit = val);
+                      }),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                final name = nameController.text.trim();
+                if (name.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('يرجى إدخال اسم الطفل')),
+                  );
+                  return;
+                }
+
+                final profile = ChildProfile(
+                  id: isEditing
+                      ? child.id
+                      : 'child_${DateTime.now().millisecondsSinceEpoch}',
+                  name: name,
+                  age: selectedAge,
+                  isScreenTimeEnabled: isEnabled,
+                  dailyLimitMinutes: isEnabled ? selectedLimit : 0,
+                  secondsUsedToday: isEditing ? child.secondsUsedToday : 0,
+                  lastActiveDate: isEditing ? child.lastActiveDate : null,
+                  isTemporarilyUnlocked:
+                      isEditing ? child.isTemporarilyUnlocked : false,
+                );
+
+                await ScreenTimeService().saveChild(profile);
+                if (mounted) {
+                  Navigator.pop(ctx);
+                  setState(() {});
+                }
+              },
+              child: const Text('حفظ'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLimitChip(
+      String label, int minutes, int current, Function(int) onSelected) {
+    final isSelected = current == minutes;
+    return ChoiceChip(
+      label: Text(label, style: const TextStyle(fontSize: 12)),
+      selected: isSelected,
+      selectedColor: AppTheme.primaryBlue.withValues(alpha: 0.2),
+      onSelected: (_) => onSelected(minutes),
+    );
+  }
+
+  void _confirmDeleteChild(ChildProfile child) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('حذف ملف الطفل'),
+        content: Text('هل أنت متأكد من رغبتك في حذف ملف (${child.name})؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            onPressed: () async {
+              await ScreenTimeService().deleteChild(child.id);
+              if (mounted) {
+                Navigator.pop(ctx);
+                setState(() {});
+              }
+            },
+            child: const Text('حذف'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPasswordScreen() {
     return Scaffold(
       body: Container(
@@ -858,62 +1322,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  void _showTimeLimitDialog() {
-    int? selectedMinutes;
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('حد وقت اللعب اليومي'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<int>(
-                title: const Text('لا يوجد حد'),
-                value: 0,
-                groupValue: selectedMinutes ?? (_settings!.dailyPlayTimeLimit ?? 0),
-                onChanged: (value) => setState(() => selectedMinutes = value),
-              ),
-              RadioListTile<int>(
-                title: const Text('30 دقيقة'),
-                value: 30,
-                groupValue: selectedMinutes ?? (_settings!.dailyPlayTimeLimit ?? 0),
-                onChanged: (value) => setState(() => selectedMinutes = value),
-              ),
-              RadioListTile<int>(
-                title: const Text('60 دقيقة'),
-                value: 60,
-                groupValue: selectedMinutes ?? (_settings!.dailyPlayTimeLimit ?? 0),
-                onChanged: (value) => setState(() => selectedMinutes = value),
-              ),
-              RadioListTile<int>(
-                title: const Text('90 دقيقة'),
-                value: 90,
-                groupValue: selectedMinutes ?? (_settings!.dailyPlayTimeLimit ?? 0),
-                onChanged: (value) => setState(() => selectedMinutes = value),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final limit = selectedMinutes == 0 ? null : selectedMinutes;
-                final updated = _settings!.copyWith(dailyPlayTimeLimit: limit);
-                await _parentService.updateSettings(updated);
-                _loadData();
-                Navigator.pop(context);
-              },
-              child: const Text('حفظ'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   void _showGameSelectionDialog() {
     final selectedGames = Set<String>.from(_settings!.allowedGameIds);

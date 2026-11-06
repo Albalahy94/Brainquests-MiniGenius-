@@ -10,6 +10,7 @@ import '../../../core/widgets/glassmorphic_container.dart';
 import '../widgets/game_card.dart';
 import '../widgets/bottom_navigation.dart';
 import '../widgets/animated_background.dart';
+import '../../../core/services/screen_time_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -120,7 +121,59 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ).animate().fadeIn(duration: 600.ms).slideY(begin: -0.2, end: 0),
-                      const SizedBox(height: 24),
+                      // Active Child & Screen Time Indicator Pill
+                      AnimatedBuilder(
+                        animation: ScreenTimeService(),
+                        builder: (context, _) {
+                          final screenTime = ScreenTimeService();
+                          final child = screenTime.activeChild;
+                          final hasLimit = child.isScreenTimeEnabled &&
+                              child.dailyLimitMinutes > 0;
+                          final rem = child.remainingMinutes;
+
+                          return Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.14),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.18),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.face_rounded,
+                                    size: 14, color: Colors.amberAccent),
+                                const SizedBox(width: 5),
+                                Text(
+                                  child.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                if (hasLimit) ...[
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    rem >= 0 ? '• ⏳ باقي $rem د' : '• ⏳ مفتوح',
+                                    style: TextStyle(
+                                      color: rem > 5
+                                          ? Colors.white70
+                                          : Colors.amberAccent,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 18),
                       // Quick Action Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

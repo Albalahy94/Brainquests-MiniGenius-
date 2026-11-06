@@ -14,6 +14,8 @@ import 'package:minigenius/core/models/daily_challenge.dart';
 import 'package:minigenius/core/models/currency.dart';
 import 'package:minigenius/core/models/parent_dashboard.dart';
 import 'package:minigenius/features/worlds/ui/world_levels_screen.dart';
+import 'package:minigenius/core/services/screen_time_service.dart';
+import 'package:minigenius/core/widgets/screen_time_watcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +52,9 @@ void main() async {
   // Create provider
   final appStateProvider = AppStateProvider();
   await appStateProvider.initialize();
+
+  // Initialize Screen Time and Child Profiles
+  await ScreenTimeService().initialize();
 
   runApp(
     ChangeNotifierProvider.value(
@@ -90,6 +95,11 @@ class MiniGeniusApp extends StatelessWidget {
         return null;
       },
       initialRoute: AppRoutes.splash,
+      builder: (context, child) {
+        return ScreenTimeWatcher(
+          child: child ?? const SizedBox(),
+        );
+      },
     );
   }
 }

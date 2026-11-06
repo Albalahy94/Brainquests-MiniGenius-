@@ -90,11 +90,18 @@ class NatureLandscapePainter extends CustomPainter {
   void _drawCloud(Canvas canvas, Offset center, double radius) {
     final cloudPaint = Paint()..color = Colors.white.withValues(alpha: 0.85);
     canvas.drawCircle(center, radius, cloudPaint);
-    canvas.drawCircle(Offset(center.dx - radius * 0.6, center.dy + radius * 0.2), radius * 0.7, cloudPaint);
-    canvas.drawCircle(Offset(center.dx + radius * 0.6, center.dy + radius * 0.2), radius * 0.75, cloudPaint);
+    canvas.drawCircle(
+        Offset(center.dx - radius * 0.6, center.dy + radius * 0.2),
+        radius * 0.7,
+        cloudPaint);
+    canvas.drawCircle(
+        Offset(center.dx + radius * 0.6, center.dy + radius * 0.2),
+        radius * 0.75,
+        cloudPaint);
   }
 
-  void _drawTree(Canvas canvas, Offset base, double canopyRadius, Color foliageColor) {
+  void _drawTree(
+      Canvas canvas, Offset base, double canopyRadius, Color foliageColor) {
     // Trunk
     final trunkPaint = Paint()..color = const Color(0xFF6D4C41);
     final trunkRect = Rect.fromCenter(
@@ -102,18 +109,32 @@ class NatureLandscapePainter extends CustomPainter {
       width: canopyRadius * 0.28,
       height: canopyRadius * 1.2,
     );
-    canvas.drawRRect(RRect.fromRectAndRadius(trunkRect, const Radius.circular(4)), trunkPaint);
+    canvas.drawRRect(
+        RRect.fromRectAndRadius(trunkRect, const Radius.circular(4)),
+        trunkPaint);
 
     // Foliage Circles
     final foliagePaint = Paint()..color = foliageColor;
     final topCenter = Offset(base.dx, base.dy - canopyRadius * 1.3);
     canvas.drawCircle(topCenter, canopyRadius, foliagePaint);
-    canvas.drawCircle(Offset(topCenter.dx - canopyRadius * 0.35, topCenter.dy + canopyRadius * 0.2), canopyRadius * 0.75, foliagePaint);
-    canvas.drawCircle(Offset(topCenter.dx + canopyRadius * 0.35, topCenter.dy + canopyRadius * 0.2), canopyRadius * 0.75, foliagePaint);
+    canvas.drawCircle(
+        Offset(topCenter.dx - canopyRadius * 0.35,
+            topCenter.dy + canopyRadius * 0.2),
+        canopyRadius * 0.75,
+        foliagePaint);
+    canvas.drawCircle(
+        Offset(topCenter.dx + canopyRadius * 0.35,
+            topCenter.dy + canopyRadius * 0.2),
+        canopyRadius * 0.75,
+        foliagePaint);
 
     // Highlight
     final highlightPaint = Paint()..color = Colors.white.withValues(alpha: 0.2);
-    canvas.drawCircle(Offset(topCenter.dx - canopyRadius * 0.25, topCenter.dy - canopyRadius * 0.25), canopyRadius * 0.4, highlightPaint);
+    canvas.drawCircle(
+        Offset(topCenter.dx - canopyRadius * 0.25,
+            topCenter.dy - canopyRadius * 0.25),
+        canopyRadius * 0.4,
+        highlightPaint);
   }
 
   @override
