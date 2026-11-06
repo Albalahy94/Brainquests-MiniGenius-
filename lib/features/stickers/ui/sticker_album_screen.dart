@@ -49,10 +49,11 @@ class _StickerAlbumScreenState extends State<StickerAlbumScreen> {
     
     final stickers = StickerDefinitions.getStickersByCategory(_selectedCategory);
     final unlockedStickers = _userProgress!.unlockedStickers;
+    final isAr = Directionality.of(context) == TextDirection.rtl;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sticker Album'),
+        title: Text(isAr ? 'ألبوم الملصقات' : 'Sticker Album'),
       ),
       body: Column(
         children: [
@@ -68,7 +69,7 @@ class _StickerAlbumScreenState extends State<StickerAlbumScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
-                    label: Text(_getCategoryName(category)),
+                    label: Text(_getCategoryName(category, isAr)),
                     selected: isSelected,
                     onSelected: (selected) {
                       setState(() {
@@ -90,9 +91,9 @@ class _StickerAlbumScreenState extends State<StickerAlbumScreen> {
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.0,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.82,
                 ),
                 itemCount: stickers.length,
                 itemBuilder: (context, index) {
@@ -101,48 +102,64 @@ class _StickerAlbumScreenState extends State<StickerAlbumScreen> {
 
                   return Container(
                     decoration: BoxDecoration(
-                      color: isUnlocked ? AppTheme.white : AppTheme.grey.withOpacity(0.3),
+                      color: isUnlocked ? AppTheme.white : AppTheme.grey.withOpacity(0.18),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isUnlocked ? AppTheme.primaryBlue : AppTheme.grey,
-                        width: 2,
+                        color: isUnlocked ? AppTheme.primaryBlue : AppTheme.grey.withOpacity(0.5),
+                        width: 1.5,
                       ),
                     ),
-                    child: isUnlocked
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Placeholder for sticker image
-                              Icon(
-                                Icons.star,
-                                size: 48,
-                                color: AppTheme.primaryBlue,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                sticker.name,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.lock,
-                                size: 48,
-                                color: AppTheme.grey,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Locked',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppTheme.grey,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: isUnlocked
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.stars_rounded,
+                                      size: 38,
+                                      color: Colors.amber,
                                     ),
-                              ),
-                            ],
-                          ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      sticker.name,
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.lock_rounded,
+                                      size: 34,
+                                      color: AppTheme.grey.withOpacity(0.6),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      isAr ? 'مقفل 🔒' : 'Locked 🔒',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: AppTheme.grey,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
                   );
                 },
               ),
@@ -153,14 +170,14 @@ class _StickerAlbumScreenState extends State<StickerAlbumScreen> {
     );
   }
 
-  String _getCategoryName(StickerCategory category) {
+  String _getCategoryName(StickerCategory category, bool isAr) {
     switch (category) {
       case StickerCategory.brainCharacters:
-        return 'Brains';
+        return isAr ? 'الشخصيات' : 'Brains';
       case StickerCategory.achievements:
-        return 'Achievements';
+        return isAr ? 'الإنجازات' : 'Achievements';
       case StickerCategory.rewards:
-        return 'Rewards';
+        return isAr ? 'المكافآت' : 'Rewards';
     }
   }
 }

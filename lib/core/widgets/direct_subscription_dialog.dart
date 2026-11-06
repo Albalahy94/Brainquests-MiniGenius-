@@ -110,7 +110,7 @@ class _DirectSubscriptionDialogState extends State<DirectSubscriptionDialog> {
     if (res['status'] == 'success') {
       setState(() {
         _isSuccess = true;
-        _successMessage = res['message'] ?? 'تم إرسال طلب الاشتراك بنجاح!';
+        _successMessage = res['message'] ?? 'تم إرسال طلبك بنجاح وهو قيد المراجعة حالياً من الإدارة!';
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -167,18 +167,20 @@ class _DirectSubscriptionDialogState extends State<DirectSubscriptionDialog> {
       children: [
         const CircleAvatar(
           radius: 36,
-          backgroundColor: Color(0xFFE8F5E9),
-          child: Icon(Icons.check_circle_rounded, size: 54, color: Colors.green),
+          backgroundColor: Color(0xFFE0F2F1),
+          child: Icon(Icons.mark_email_read_rounded, size: 50, color: Colors.teal),
         ),
         const SizedBox(height: 16),
         const Text(
-          'تم استلام طلبك بنجاح!',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+          'تم استلام طلبك بنجاح وهو قيد المراجعة ⏳',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
         Text(
-          _successMessage,
+          _successMessage.isNotEmpty
+              ? _successMessage
+              : 'تم تسجيل طلبك لدى الإدارة وسيتم مراجعته وتأكيد التفعيل فور استلام التحويل.',
           style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.5),
           textAlign: TextAlign.center,
         ),
@@ -208,7 +210,7 @@ class _DirectSubscriptionDialogState extends State<DirectSubscriptionDialog> {
           onPressed: _openWhatsAppSupport,
           icon: const Icon(Icons.chat_rounded, color: Colors.white),
           label: const Text(
-            'تأكيد الدفع والتفعيل الفوري عبر واتساب',
+            'تأكيد الدفع والتفعيل مع الإدارة عبر واتساب',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
           style: ElevatedButton.styleFrom(
@@ -241,18 +243,25 @@ class _DirectSubscriptionDialogState extends State<DirectSubscriptionDialog> {
                 icon: const Icon(Icons.close),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              Row(
-                children: [
-                  Text(
-                    'طلب اشتراك وتفعيل VIP مباشر',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryBlue,
-                        ),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'طلب اشتراك وتفعيل VIP مباشر',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryBlue,
+                            ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.stars_rounded, color: Colors.amber),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.stars_rounded, color: Colors.amber),
-                ],
+                ),
               ),
             ],
           ),
@@ -310,9 +319,15 @@ class _DirectSubscriptionDialogState extends State<DirectSubscriptionDialog> {
                                   ),
                                 ),
                               ),
-                              Text(
-                                p['title']!,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  p['title']!,
+                                  textAlign: TextAlign.end,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                ),
                               ),
                             ],
                           ),

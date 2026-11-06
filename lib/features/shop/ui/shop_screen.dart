@@ -35,14 +35,18 @@ class _ShopScreenState extends State<ShopScreen> {
     });
   }
 
-  Future<void> _purchaseItem(ShopItem item) async {
+  Future<void> _purchaseItem(ShopItem item, bool isAr) async {
     final success = await _shopService.purchaseItem(item.id);
     if (success) {
       _loadData(); // Refresh data
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تم شراء ${item.nameAr} بنجاح!'),
+            content: Text(
+              isAr
+                  ? 'تم شراء ${item.nameAr} بنجاح! 🎉'
+                  : 'Successfully purchased ${item.name}! 🎉',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -50,8 +54,10 @@ class _ShopScreenState extends State<ShopScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('لا توجد عملات كافية!'),
+          SnackBar(
+            content: Text(
+              isAr ? 'لا توجد عملات كافية!' : 'Not enough coins/gems!',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -66,6 +72,8 @@ class _ShopScreenState extends State<ShopScreen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Scaffold(
       body: Container(
@@ -86,7 +94,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'المتجر',
+                        isAr ? 'المتجر' : 'Shop',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                               color: Colors.white,
@@ -113,13 +121,13 @@ class _ShopScreenState extends State<ShopScreen> {
                     _CurrencyDisplay(
                       icon: Icons.monetization_on,
                       amount: _userProgress!.coins,
-                      label: 'عملات',
+                      label: isAr ? 'عملات' : 'Coins',
                       color: Colors.orange,
                     ),
                     _CurrencyDisplay(
                       icon: Icons.diamond,
                       amount: _userProgress!.gems,
-                      label: 'جواهر',
+                      label: isAr ? 'جواهر' : 'Gems',
                       color: Colors.blue,
                     ),
                   ],
@@ -131,14 +139,14 @@ class _ShopScreenState extends State<ShopScreen> {
                 children: [
                   Expanded(
                     child: _TabButton(
-                      label: 'متاح',
+                      label: isAr ? 'متاح' : 'Available',
                       isSelected: _selectedTab == 0,
                       onTap: () => setState(() => _selectedTab = 0),
                     ),
                   ),
                   Expanded(
                     child: _TabButton(
-                      label: 'مشترى',
+                      label: isAr ? 'مشترى' : 'Purchased',
                       isSelected: _selectedTab == 1,
                       onTap: () => setState(() => _selectedTab = 1),
                     ),
@@ -149,8 +157,8 @@ class _ShopScreenState extends State<ShopScreen> {
               // Items List
               Expanded(
                 child: _selectedTab == 0
-                    ? _buildAvailableItems()
-                    : _buildPurchasedItems(),
+                    ? _buildAvailableItems(isAr)
+                    : _buildPurchasedItems(isAr),
               ),
             ],
           ),
@@ -159,12 +167,12 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  Widget _buildAvailableItems() {
+  Widget _buildAvailableItems(bool isAr) {
     if (_availableItems.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'لا توجد عناصر متاحة',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          isAr ? 'لا توجد عناصر متاحة' : 'No items available',
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
       );
     }
@@ -181,18 +189,19 @@ class _ShopScreenState extends State<ShopScreen> {
         return _ShopItemCard(
           item: item,
           canAfford: canAfford,
-          onPurchase: () => _purchaseItem(item),
+          isAr: isAr,
+          onPurchase: () => _purchaseItem(item, isAr),
         );
       },
     );
   }
 
-  Widget _buildPurchasedItems() {
+  Widget _buildPurchasedItems(bool isAr) {
     if (_purchasedItems.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'لم تشترِ أي عناصر بعد',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          isAr ? 'لم تشترِ أي عناصر بعد' : 'No purchased items yet',
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
       );
     }
@@ -202,7 +211,7 @@ class _ShopScreenState extends State<ShopScreen> {
       itemCount: _purchasedItems.length,
       itemBuilder: (context, index) {
         final item = _purchasedItems[index];
-        return _PurchasedItemCard(item: item);
+        return _PurchasedItemCard(item: item, isAr: isAr);
       },
     );
   }
@@ -293,11 +302,13 @@ class _TabButton extends StatelessWidget {
 class _ShopItemCard extends StatelessWidget {
   final ShopItem item;
   final bool canAfford;
+  final bool isAr;
   final VoidCallback onPurchase;
 
   const _ShopItemCard({
     required this.item,
     required this.canAfford,
+    required this.isAr,
     required this.onPurchase,
   });
 
@@ -321,8 +332,8 @@ class _ShopItemCard extends StatelessWidget {
         children: [
           // Icon/Image placeholder
           Container(
-            width: 60,
-            height: 60,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: AppTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -330,35 +341,37 @@ class _ShopItemCard extends StatelessWidget {
             child: Icon(
               _getIconForType(item.type),
               color: AppTheme.primaryBlue,
-              size: 32,
+              size: 30,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.nameAr,
+                  isAr ? item.nameAr : item.name,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  item.descriptionAr,
+                  isAr ? item.descriptionAr : item.description,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     color: Colors.grey[600],
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 10),
           Column(
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     item.isPremium ? Icons.diamond : Icons.monetization_on,
@@ -369,7 +382,7 @@ class _ShopItemCard extends StatelessWidget {
                   Text(
                     '${item.price}',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: canAfford ? Colors.black : Colors.red,
                     ),
@@ -382,11 +395,12 @@ class _ShopItemCard extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: canAfford ? AppTheme.primaryBlue : Colors.grey,
                   foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('شراء'),
+                child: Text(isAr ? 'شراء' : 'Buy'),
               ),
             ],
           ),
@@ -413,8 +427,12 @@ class _ShopItemCard extends StatelessWidget {
 
 class _PurchasedItemCard extends StatelessWidget {
   final ShopItem item;
+  final bool isAr;
 
-  const _PurchasedItemCard({required this.item});
+  const _PurchasedItemCard({
+    required this.item,
+    required this.isAr,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -429,8 +447,8 @@ class _PurchasedItemCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: Colors.green.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -438,36 +456,36 @@ class _PurchasedItemCard extends StatelessWidget {
             child: const Icon(
               Icons.check_circle,
               color: Colors.green,
-              size: 32,
+              size: 30,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.nameAr,
+                  isAr ? item.nameAr : item.name,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  item.descriptionAr,
+                  isAr ? item.descriptionAr : item.description,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     color: Colors.grey[600],
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.check, color: Colors.green, size: 32),
+          const SizedBox(width: 8),
+          const Icon(Icons.check, color: Colors.green, size: 28),
         ],
       ),
     );
   }
 }
-

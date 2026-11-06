@@ -134,6 +134,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               child.dailyLimitMinutes > 0;
                           final rem = child.remainingMinutes;
 
+                          // Only show if the parent has actively enabled screen time limits
+                          if (!hasLimit) {
+                            return const SizedBox.shrink();
+                          }
+
                           return Container(
                             margin: const EdgeInsets.only(top: 8),
                             padding: const EdgeInsets.symmetric(

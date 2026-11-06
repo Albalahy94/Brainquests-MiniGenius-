@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/iap_service.dart';
+import '../../../core/services/vip_service.dart';
+import '../../../core/services/storage_service.dart';
+import '../../../core/services/licensing_api_service.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/widgets/redeem_code_dialog.dart';
 import '../../../core/widgets/direct_subscription_dialog.dart';
@@ -25,6 +28,19 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _handlePurchase() async {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
+    // If store products are empty or IAP is not available, open the direct subscription dialog
+    if (!_iapService.isAvailable || _iapService.products.isEmpty) {
+      final planId = _selectedPlanIndex == 0
+          ? 'yearly'
+          : (_selectedPlanIndex == 1 ? 'monthly' : 'lifetime');
+      if (mounted) {
+        await DirectSubscriptionDialog.show(context, initialPlanId: planId);
+      }
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -41,7 +57,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
       if (success) {
         if (mounted) {
-          final isAr = Directionality.of(context) == TextDirection.rtl;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(isAr
@@ -54,12 +69,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
         }
       } else {
         if (mounted) {
-          final isAr = Directionality.of(context) == TextDirection.rtl;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(isAr
-                  ? 'تعذر إتمام عملية الشراء. يرجى المحاولة مرة أخرى.'
-                  : 'Purchase could not be completed. Please try again.'),
+                  ? 'تعذر إتمام عملية الشراء عبر المتجر. يمكنك استخدام طلب الاشتراك المباشر.'
+                  : 'Purchase could not be completed via store. You can use direct subscription.'),
               backgroundColor: Colors.red,
             ),
           );
@@ -69,7 +83,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(isAr ? 'حدث خطأ: $e' : 'Error: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -88,25 +102,56 @@ class _PremiumScreenState extends State<PremiumScreen> {
       _isLoading = true;
     });
 
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
     try {
+      // 1. Trigger store restore (Google Play / App Store)
       await _iapService.restorePurchases();
+
+      // 2. Check and sync with central Albalahy licensing server via device ID / account
+      await LicensingApiService().verifyLicense();
+
+      // Give a brief moment for storage & reactive listeners to update
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      final storage = StorageService();
+      await storage.init();
+      final isNowVip = VipService().isUserVip(storage);
+
       if (mounted) {
-        final isAr = Directionality.of(context) == TextDirection.rtl;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(isAr
-                ? 'تم استعادة مشترياتك بنجاح!'
-                : 'Purchases restored successfully!'),
-            backgroundColor: AppTheme.mintGreen,
-          ),
-        );
-        Navigator.pop(context, true);
+        if (isNowVip) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isAr
+                  ? 'تم استعادة وتأكيد اشتراكك بنجاح! 🎉'
+                  : 'Purchases restored successfully! 🎉'),
+              backgroundColor: AppTheme.mintGreen,
+            ),
+          );
+          Navigator.pop(context, true);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isAr
+                  ? 'لم يتم العثور على اشتراك نشط سابق لهذا الحساب أو الجهاز.'
+                  : 'No active subscriptions found for this account or device.'),
+              backgroundColor: Colors.orange.shade800,
+              action: SnackBarAction(
+                label: isAr ? 'طلب اشتراك' : 'Subscribe',
+                textColor: Colors.white,
+                onPressed: () {
+                  DirectSubscriptionDialog.show(context);
+                },
+              ),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(isAr ? 'حدث خطأ أثناء الاستعادة: $e' : 'Error restoring purchases: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -122,7 +167,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isAr = Directionality.of(context) == TextDirection.rtl;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final yearlyProduct = _iapService.getYearlyProduct();
     final monthlyProduct = _iapService.getMonthlyProduct();
     final lifetimeProduct = _iapService.getLifetimeProduct();
@@ -254,9 +299,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       // Promo Code Banner
                       InkWell(
                         onTap: () async {
+                          final nav = Navigator.of(context);
                           final success = await showRedeemCodeDialog(context);
                           if (success == true && mounted) {
-                            Navigator.pop(context, true);
+                            nav.pop(true);
                           }
                         },
                         borderRadius: BorderRadius.circular(16),
@@ -568,12 +614,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  price,
-                  style: TextStyle(
-                    color: isSelected ? const Color(0xFFFFD54F) : Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    price,
+                    style: TextStyle(
+                      color: isSelected ? const Color(0xFFFFD54F) : Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
               ],

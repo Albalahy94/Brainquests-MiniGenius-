@@ -42,6 +42,7 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
       );
     }
 
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final isCompleted = _progress?.isCompleted ?? false;
     final currentScore = _progress?.currentScore ?? 0;
 
@@ -64,7 +65,7 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'التحدي اليومي',
+                        isAr ? 'التحدي اليومي' : 'Daily Challenge',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                               color: Colors.white,
@@ -100,9 +101,11 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Text(
-                        'يوم متتالي',
-                        style: TextStyle(
+                      Text(
+                        isAr
+                            ? 'يوم متتالي'
+                            : (_streak!.currentStreak == 1 ? 'day streak' : 'days streak'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                         ),
@@ -134,7 +137,8 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                         child: Column(
                           children: [
                             Text(
-                              _challenge!.titleAr,
+                              isAr ? _challenge!.titleAr : _challenge!.title,
+                              textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -143,7 +147,7 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              _challenge!.descriptionAr,
+                              isAr ? _challenge!.descriptionAr : _challenge!.description,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
@@ -151,13 +155,15 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            
+
                             // Progress
                             if (!isCompleted)
                               Column(
                                 children: [
                                   Text(
-                                    'الهدف: ${_challenge!.targetScore} نقطة',
+                                    isAr
+                                        ? 'الهدف: ${_challenge!.targetScore} نقطة'
+                                        : 'Target: ${_challenge!.targetScore} pts',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -187,14 +193,14 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                                   color: Colors.green.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.check_circle, color: Colors.green, size: 32),
-                                    SizedBox(width: 8),
+                                    const Icon(Icons.check_circle, color: Colors.green, size: 32),
+                                    const SizedBox(width: 8),
                                     Text(
-                                      'تم إكمال التحدي!',
-                                      style: TextStyle(
+                                      isAr ? 'تم إكمال التحدي!' : 'Challenge Completed!',
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.green,
@@ -218,9 +224,9 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                         ),
                         child: Column(
                           children: [
-                            const Text(
-                              'المكافآت',
-                              style: TextStyle(
+                            Text(
+                              isAr ? 'المكافآت' : 'Rewards',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -232,12 +238,16 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                               children: [
                                 _RewardItem(
                                   icon: Icons.star,
-                                  label: '${_challenge!.rewardStars} نجوم',
+                                  label: isAr
+                                      ? '${_challenge!.rewardStars} نجوم'
+                                      : '${_challenge!.rewardStars} Stars',
                                   color: Colors.amber,
                                 ),
                                 _RewardItem(
                                   icon: Icons.monetization_on,
-                                  label: '${_challenge!.rewardCoins} عملة',
+                                  label: isAr
+                                      ? '${_challenge!.rewardCoins} عملة'
+                                      : '${_challenge!.rewardCoins} Coins',
                                   color: Colors.orange,
                                 ),
                               ],
@@ -255,7 +265,6 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                           height: 56,
                           child: ElevatedButton(
                             onPressed: () {
-                              // Navigate to the game
                               final gameRoutes = {
                                 'memory_cards': AppRoutes.memoryCards,
                                 'quick_math': AppRoutes.quickMath,
@@ -276,9 +285,9 @@ class _DailyChallengeScreenState extends State<DailyChallengeScreen> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            child: const Text(
-                              'ابدأ اللعب',
-                              style: TextStyle(
+                            child: Text(
+                              isAr ? 'ابدأ اللعب' : 'Start Playing',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -326,4 +335,3 @@ class _RewardItem extends StatelessWidget {
     );
   }
 }
-

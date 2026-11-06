@@ -89,10 +89,8 @@ class IAPService {
 
   Future<bool> purchaseProduct(String productId) async {
     if (!_isAvailable || _products.isEmpty) {
-      // In development or test mode, simulate successful purchase
-      debugPrint('ℹ️ Simulating purchase for product: $productId');
-      await activatePremiumLocally();
-      return true;
+      debugPrint('ℹ️ Store products unavailable for purchase: $productId');
+      return false;
     }
 
     try {

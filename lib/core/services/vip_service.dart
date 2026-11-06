@@ -29,7 +29,7 @@ class VipService {
     String? gameName,
     int? levelNumber,
   }) async {
-    final isAr = Directionality.of(context) == TextDirection.rtl;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     final shouldShowPaywall = await showDialog<bool>(
       context: context,
@@ -58,44 +58,46 @@ class VipService {
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isAr
-                  ? 'المرحلة رقم ${levelNumber ?? 11} ${gameName != null ? "في لعبة $gameName" : ""} مصممة للأطفال المتقدمين وهي حصرية لمشتركي باقة Brainquests Pro.'
-                  : 'Level ${levelNumber ?? 11} ${gameName != null ? "in $gameName" : ""} features advanced cognitive challenges exclusive to Brainquests Pro subscribers.',
-              style: const TextStyle(fontSize: 15, height: 1.4),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.amber.withOpacity(0.3)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isAr
+                    ? 'المرحلة رقم ${levelNumber ?? 11} ${gameName != null ? "في لعبة $gameName" : ""} مصممة للأطفال المتقدمين وهي حصرية لمشتركي باقة Brainquests Pro.'
+                    : 'Level ${levelNumber ?? 11} ${gameName != null ? "in $gameName" : ""} features advanced cognitive challenges exclusive to Brainquests Pro subscribers.',
+                style: const TextStyle(fontSize: 15, height: 1.4),
               ),
-              child: Column(
-                children: [
-                  _buildBenefitRow(
-                    Icons.star_rounded,
-                    isAr ? '+100 مستوى وتحدي ذكاء جديد' : '+100 New Pro levels & challenges',
-                  ),
-                  const SizedBox(height: 8),
-                  _buildBenefitRow(
-                    Icons.palette_rounded,
-                    isAr ? 'أشكال وثيمات حصرية للألعاب' : 'Exclusive game themes & shapes',
-                  ),
-                  const SizedBox(height: 8),
-                  _buildBenefitRow(
-                    Icons.psychology_rounded,
-                    isAr ? 'رادار قياس ذكاء وتطور الطفل' : 'Cognitive development radar',
-                  ),
-                ],
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    _buildBenefitRow(
+                      Icons.star_rounded,
+                      isAr ? '+100 مستوى وتحدي ذكاء جديد' : '+100 New Pro levels & challenges',
+                    ),
+                    const SizedBox(height: 8),
+                    _buildBenefitRow(
+                      Icons.palette_rounded,
+                      isAr ? 'أشكال وثيمات حصرية للألعاب' : 'Exclusive game themes & shapes',
+                    ),
+                    const SizedBox(height: 8),
+                    _buildBenefitRow(
+                      Icons.psychology_rounded,
+                      isAr ? 'رادار قياس ذكاء وتطور الطفل' : 'Cognitive development radar',
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -108,11 +110,14 @@ class VipService {
               backgroundColor: Colors.amber[700],
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             ),
-            child: Text(
-              isAr ? 'استكشاف باقات الاشتراك 🚀' : 'Explore Subscriptions 🚀',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                isAr ? 'استكشاف باقات الاشتراك 🚀' : 'Explore Subscriptions 🚀',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],
