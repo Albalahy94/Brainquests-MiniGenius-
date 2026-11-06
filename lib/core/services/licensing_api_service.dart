@@ -69,15 +69,25 @@ class LicensingApiService {
               subData['plan'] == 'pro' ||
               subData['plan'] == 'ultimate';
 
+          final prefs = await SharedPreferences.getInstance();
           if (isPro) {
             await _storageService.updateUserProgress((p) {
               p.isPremium = true;
               return p;
             });
-            final prefs = await SharedPreferences.getInstance();
             await prefs.setString(_licensePlanKey, subData['plan'] ?? 'pro');
             await prefs.setString(
                 _licenseExpiresKey, subData['expires_at'] ?? '');
+          } else {
+            // Server confirmed this device is NOT Pro (free or pending review)
+            await _storageService.updateUserProgress((p) {
+              if (p.isTestMode != true) {
+                p.isPremium = false;
+              }
+              return p;
+            });
+            await prefs.setString(_licensePlanKey, 'free');
+            await prefs.remove(_licenseExpiresKey);
           }
         }
 

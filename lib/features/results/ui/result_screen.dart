@@ -258,11 +258,57 @@ class _ResultScreenState extends State<ResultScreen>
                   const SizedBox(height: 32),
 
                   // Level passed text
+                  if (widget.level > 10) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFD54F), Color(0xFFFFA000)],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.amber.withOpacity(0.5),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.workspace_premium,
+                              color: Color(0xFF3E2723), size: 22),
+                          const SizedBox(width: 8),
+                          Text(
+                            Localizations.localeOf(context).languageCode == 'ar'
+                                ? '👑 بطل VIP المحترف!'
+                                : '👑 VIP Pro Champion!',
+                            style: const TextStyle(
+                              color: Color(0xFF3E2723),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+
                   Text(
-                    'Level Passed!',
+                    widget.level > 10
+                        ? (Localizations.localeOf(context).languageCode == 'ar'
+                            ? 'تم اجتياز تحدي المحترفين!'
+                            : 'VIP Challenge Conquered!')
+                        : (Localizations.localeOf(context).languageCode == 'ar'
+                            ? 'أحسنت! تم اجتياز المرحلة'
+                            : 'Level Passed!'),
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                           color: AppTheme.white,
+                          fontWeight: FontWeight.bold,
                         ),
+                    textAlign: TextAlign.center,
                   ),
 
                   const SizedBox(height: 16),
@@ -276,7 +322,7 @@ class _ResultScreenState extends State<ResultScreen>
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '+${widget.points} Points',
+                      '+${widget.points} ${Localizations.localeOf(context).languageCode == 'ar' ? 'نقطة' : 'Points'}',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: AppTheme.white,
                           ),
@@ -297,7 +343,9 @@ class _ResultScreenState extends State<ResultScreen>
                             const Icon(Icons.star, size: 48, color: Colors.orange),
                             const SizedBox(height: 8),
                             Text(
-                              'New Sticker Unlocked!',
+                              Localizations.localeOf(context).languageCode == 'ar'
+                                  ? 'تم فتح ملصق جديد!'
+                                  : 'New Sticker Unlocked!',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
@@ -308,7 +356,9 @@ class _ResultScreenState extends State<ResultScreen>
                                 size: 48, color: Colors.orange),
                             const SizedBox(height: 8),
                             Text(
-                              'New Badge Unlocked!',
+                              Localizations.localeOf(context).languageCode == 'ar'
+                                  ? 'تم فتح وسام جديد!'
+                                  : 'New Badge Unlocked!',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ]
@@ -336,7 +386,9 @@ class _ResultScreenState extends State<ResultScreen>
                               padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
                             child: Text(
-                              'Next Level',
+                              Localizations.localeOf(context).languageCode == 'ar'
+                                  ? 'المرحلة التالية'
+                                  : 'Next Level',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ),
@@ -354,7 +406,11 @@ class _ResultScreenState extends State<ResultScreen>
                                   side: const BorderSide(color: AppTheme.white),
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                 ),
-                                child: const Text('Retry'),
+                                child: Text(
+                                  Localizations.localeOf(context).languageCode == 'ar'
+                                      ? 'إعادة المحاولة'
+                                      : 'Retry',
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -369,7 +425,11 @@ class _ResultScreenState extends State<ResultScreen>
                                   side: const BorderSide(color: AppTheme.white),
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                 ),
-                                child: const Text('Home'),
+                                child: Text(
+                                  Localizations.localeOf(context).languageCode == 'ar'
+                                      ? 'الرئيسية'
+                                      : 'Home',
+                                ),
                               ),
                             ),
                           ],

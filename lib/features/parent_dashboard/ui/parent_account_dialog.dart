@@ -176,7 +176,7 @@ class _ParentAccountDialogState extends State<ParentAccountDialog> {
       SnackBar(
         content: Text(isPro
             ? (isAr ? '✅ تم تحديث الترخيص: حسابك مفعل باقة VIP بنجاح!' : '✅ License updated: VIP Pro active!')
-            : (isAr ? 'ℹ️ تم المزامنة بنجاح مع السيرفر المركزي.' : 'ℹ️ Synchronized with central server.')),
+            : (isAr ? 'ℹ️ باقة جهازك الحالية: مجانية (طلب الاشتراك قيد مراجعة الإدارة).' : 'ℹ️ Device plan: Free (request pending admin review).')),
         backgroundColor: isPro ? Colors.green : Colors.blueGrey,
       ),
     );

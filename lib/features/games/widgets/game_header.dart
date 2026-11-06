@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/services/vip_service.dart';
 import 'exit_game_dialog.dart';
 
 /// A standardized header widget for all games
@@ -40,14 +41,31 @@ class GameHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isVip = VipService.isVipLevel(level);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: isVip ? null : backgroundColor,
+        gradient: isVip
+            ? const LinearGradient(
+                colors: [Color(0xFF1E1B4B), Color(0xFF312E81)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        border: isVip
+            ? const Border(
+                bottom: BorderSide(color: Color(0xFFFFD54F), width: 2.5),
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
+            color: isVip
+                ? const Color(0xFFFFD54F).withOpacity(0.25)
+                : Colors.black.withOpacity(0.1),
+            blurRadius: isVip ? 8 : 4,
             offset: const Offset(0, 2),
           ),
         ],
@@ -71,22 +89,62 @@ class GameHeader extends StatelessWidget {
               flex: 2,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'المستوى $level',
-                    style: const TextStyle(
-                      color: AppTheme.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+                child: isVip
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFFD54F), Color(0xFFFFA000)],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amber.withOpacity(0.4),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.workspace_premium,
+                              color: Color(0xFF3E2723),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isAr
+                                  ? 'VIP المحترف • $level'
+                                  : 'VIP PRO • $level',
+                              style: const TextStyle(
+                                color: Color(0xFF3E2723),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          isAr ? 'المستوى $level' : 'Level $level',
+                          style: const TextStyle(
+                            color: AppTheme.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
               ),
             ),
 

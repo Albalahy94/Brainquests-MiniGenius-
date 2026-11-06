@@ -63,10 +63,7 @@ class AppStateProvider extends ChangeNotifier {
       // Verify central device license status on app launch (non-blocking)
       LicensingApiService().verifyLicense().then((res) {
         final subData = res['data'] as Map<String, dynamic>?;
-        if (subData != null &&
-            (subData['is_pro'] == true ||
-                subData['plan'] == 'pro' ||
-                subData['plan'] == 'ultimate')) {
+        if (subData != null) {
           _userProgress = _storageService.getUserProgress();
           notifyListeners();
         }

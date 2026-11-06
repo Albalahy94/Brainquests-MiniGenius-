@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/storage_service.dart';
+import '../../../../core/services/vip_service.dart';
 import '../../../../core/models/game_progress.dart';
 import '../../../results/ui/result_screen.dart';
 import '../../widgets/game_header.dart';
@@ -41,6 +42,22 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
     _gameStartTime = DateTime.now();
     _initializeGame();
     _startTimer();
+
+    // Enforce VIP lock: prevent unauthorized access to VIP levels
+    if (VipService.isVipLevel(widget.level) &&
+        !VipService().isUserVip(widget.storageService)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        VipService().showVipLockedDialog(
+          context,
+          gameName: Directionality.of(context) == TextDirection.rtl
+              ? 'إيجاد الاختلافات'
+              : 'Find Differences',
+          levelNumber: widget.level,
+        );
+      });
+    }
   }
 
   void _initializeGame() {
@@ -135,6 +152,9 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
 
     // Calculate points
     int points = (160 * widget.level) - (_timeElapsed * 2);
+    if (VipService.isVipLevel(widget.level)) {
+      points = (points * 2); // 2X VIP Pro Double Points Bonus
+    }
     if (points < 20) points = 20;
 
     // Save progress
@@ -345,11 +365,18 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
   Widget build(BuildContext context) {
     final isAr = Directionality.of(context) == TextDirection.rtl;
     final sceneTitle = isAr ? _scene.titleAr : _scene.titleEn;
+    final isVip = VipService.isVipLevel(widget.level);
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppTheme.blueGradient,
+        decoration: BoxDecoration(
+          gradient: isVip
+              ? const LinearGradient(
+                  colors: [Color(0xFF0F172A), Color(0xFF1E293B), Color(0xFF1E1B4B)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )
+              : AppTheme.blueGradient,
         ),
         child: SafeArea(
           child: Column(
@@ -362,6 +389,50 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
                     '${_timeElapsed ~/ 60}:${(_timeElapsed % 60).toString().padLeft(2, '0')}',
                 onExit: () => Navigator.pop(context),
               ),
+
+              // VIP Pro Exclusive Banner
+              if (isVip)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFB45309), Color(0xFFF59E0B), Color(0xFFD97706)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFFFFD54F), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.workspace_premium, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            isAr
+                                ? '⭐ مرحلة المحترفين VIP • نقاط مضاعفة 2X ⭐'
+                                : '⭐ VIP Pro Challenge • 2X Points ⭐',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
 
               // Level Theme Title Badge
               Padding(
@@ -411,7 +482,10 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
                                 clipBehavior: Clip.hardEdge,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  border: Border.all(
+                                    color: isVip ? const Color(0xFFFFD54F) : Colors.white,
+                                    width: isVip ? 3.5 : 2.5,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.25),
@@ -435,7 +509,10 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
                                 clipBehavior: Clip.hardEdge,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  border: Border.all(
+                                    color: isVip ? const Color(0xFFFFD54F) : Colors.white,
+                                    width: isVip ? 3.5 : 2.5,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.25),
@@ -464,7 +541,10 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
                                 clipBehavior: Clip.hardEdge,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  border: Border.all(
+                                    color: isVip ? const Color(0xFFFFD54F) : Colors.white,
+                                    width: isVip ? 3.5 : 2.5,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.25),
@@ -488,7 +568,10 @@ class _FindDifferenceGameScreenState extends State<FindDifferenceGameScreen> {
                                 clipBehavior: Clip.hardEdge,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: Colors.white, width: 2.5),
+                                  border: Border.all(
+                                    color: isVip ? const Color(0xFFFFD54F) : Colors.white,
+                                    width: isVip ? 3.5 : 2.5,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.25),
