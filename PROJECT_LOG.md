@@ -66,6 +66,10 @@
      - `minigenius_pro_monthly` (الاشتراك الشهري).
      - الحفاظ على `minigenius_lifetime` والـ Legacy IDs لضمان التوافق العكسي مع جوجل بلاي.
    - حفظ التوثيق الشامل في [`docs/Fixes_and_Guides/APP_STORE_VERSION_2_METADATA.md`](file:///d:/projects/Brainquests/docs/Fixes_and_Guides/APP_STORE_VERSION_2_METADATA.md).
+3. **تطوير تكامل البوابة المركزية (Albalahy Portal) والإشعارات:**
+   - إضافة فلتر ديناميكي ذكي للتطبيقات في شاشة المشتركين والأجهزة (`UserManagement.jsx`) يقرأ كافة التطبيقات المسجلة في النظام تلقائياً ويفلتر بناءً عليها.
+   - تفعيل إشعارات الهاتف التنبيهية في `NotificationService` و `LicensingApiService`: إرسال إشعار للمستخدم فور تفعيل أو إلغاء باقته من لوحة التحكم، وإشعار عند تحديث والرد على تذاكر الدعم الفني الخاصة به.
+   - تحديث واجهة `verify.php` في البوابة لإرجاع التذاكر وحالتها الحية لحظياً.
 
 ---
 

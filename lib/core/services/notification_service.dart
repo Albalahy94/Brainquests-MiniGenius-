@@ -88,6 +88,45 @@ class NotificationService {
     }
   }
 
+  /// Show subscription or support ticket update notification
+  Future<void> showSystemNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+
+    try {
+      const androidDetails = AndroidNotificationDetails(
+        'subscription_updates',
+        'تحديثات الاشتراكات والدعم',
+        channelDescription: 'إشعارات تفعيل الاشتراكات وتحديثات تذاكر الدعم الفني',
+        importance: Importance.max,
+        priority: Priority.high,
+        showWhen: true,
+      );
+
+      const iosDetails = DarwinNotificationDetails();
+
+      const details = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.show(
+        DateTime.now().millisecondsSinceEpoch % 100000,
+        title,
+        body,
+        details,
+        payload: payload,
+      );
+    } catch (e) {
+      debugPrint('Error showing system notification: $e');
+    }
+  }
+
   /// Show badge unlocked notification
   Future<void> showBadgeUnlocked(String badgeId) async {
     final badgeNames = {

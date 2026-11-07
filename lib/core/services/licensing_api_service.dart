@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'storage_service.dart';
+import 'notification_service.dart';
 
 class LicensingApiService {
   static final LicensingApiService _instance = LicensingApiService._internal();
@@ -70,14 +71,25 @@ class LicensingApiService {
               subData['plan'] == 'ultimate';
 
           final prefs = await SharedPreferences.getInstance();
+          final previousPlan = prefs.getString(_licensePlanKey) ?? 'free';
+          final newPlan = subData['plan'] ?? (isPro ? 'pro' : 'free');
+
           if (isPro) {
             await _storageService.updateUserProgress((p) {
               p.isPremium = true;
               return p;
             });
-            await prefs.setString(_licensePlanKey, subData['plan'] ?? 'pro');
+            await prefs.setString(_licensePlanKey, newPlan);
             await prefs.setString(
                 _licenseExpiresKey, subData['expires_at'] ?? '');
+
+            // Plan upgraded notification
+            if (previousPlan == 'free') {
+              NotificationService().showSystemNotification(
+                title: '🎉 تم تفعيل اشتراكك بنجاح!',
+                body: 'تهانينا! تم تفعيل باقة Brainquests Pro لكافة الألعاب والمستويات.',
+              );
+            }
           } else {
             // Server confirmed this device is NOT Pro (free or pending review)
             await _storageService.updateUserProgress((p) {
@@ -88,6 +100,43 @@ class LicensingApiService {
             });
             await prefs.setString(_licensePlanKey, 'free');
             await prefs.remove(_licenseExpiresKey);
+
+            // Plan cancelled/expired notification
+            if (previousPlan != 'free') {
+              NotificationService().showSystemNotification(
+                title: '⚠️ تنبيه انتهاء الاشتراك',
+                body: 'انتهت فترة اشتراكك في باقة Pro، يمكنك التجديد في أي وقت.',
+              );
+            }
+          }
+
+          // Check for support ticket status updates
+          if (subData['tickets'] != null && subData['tickets'] is List) {
+            final List tickets = subData['tickets'];
+            for (var t in tickets) {
+              if (t is Map<String, dynamic>) {
+                final tNum = t['ticket_number']?.toString() ?? '';
+                final tStatus = t['status']?.toString() ?? 'open';
+                final lastStatusKey = 'ticket_status_$tNum';
+                final prevStatus = prefs.getString(lastStatusKey);
+
+                if (prevStatus != null && prevStatus != tStatus) {
+                  final statusName = tStatus == 'resolved'
+                      ? 'تم حل المشكلة ✅'
+                      : (tStatus == 'in_progress' ? 'قيد المعالجة ⏳' : tStatus);
+                  final notes = t['admin_notes'] != null && t['admin_notes'].toString().isNotEmpty
+                      ? ' | رد الإدارة: ${t['admin_notes']}'
+                      : '';
+                  NotificationService().showSystemNotification(
+                    title: '💬 تحديث تذكرة الدعم ($tNum)',
+                    body: 'الحالة: $statusName$notes',
+                  );
+                }
+                await prefs.setString(lastStatusKey, tStatus);
+              }
+            }
+            // Save recent tickets json for parent dashboard display
+            await prefs.setString('cached_recent_tickets', jsonEncode(tickets));
           }
         }
 
