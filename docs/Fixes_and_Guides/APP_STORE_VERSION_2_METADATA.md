@@ -199,7 +199,55 @@ Support & Contact: mohamed@albalahy4u.com
 
 ---
 
-## 3. معلومات المراجعة لفريق آبل (App Review Information)
+## 4. بيانات وتفاصيل باقات الاشتراك في App Store Connect
+
+> **قاعدة آبل الصارمة:** بمجرد إنشاء Product ID في حساب آبل، لا يمكن إعادة استخدامه حتى لو تم حذفه من المسودات. لذلك تم اعتماد المعرفات الرسمية التالية:
+
+### أ. الباقة السنوية (داخل Subscriptions > Brainquests Pro Access):
+* **Product ID:** `minigenius_pro_yearly`
+* **Reference Name:** `Brainquests Pro Yearly`
+* **Duration:** `1 Year`
+* **السعر المقترح:** `$39.99`
+* **العرض التجريبي (Introductory Offer):** Free Trial لمدة `7 Days`
+* **اسم العرض بالإنجليزي:** `Brainquests Pro Annual`
+* **وصف العرض بالإنجليزي:** `Unlock all 20 levels, Cognitive Radar, and Pro features with 7-day free trial`
+* **اسم العرض بالعربي:** `اشتراك Brainquests Pro السنوي`
+* **وصف العرض بالعربي:** `فتح جميع المستويات المتقدمة ورادار الذكاء المعرفي مع 7 أيام تجربة مجانية`
+* **Review Notes:**
+  ```text
+  Annual auto-renewable subscription with a 7-day free trial. Unlocks all 20 levels in all 10 games, full Cognitive Radar analytics, and screen time management. Can be tested with VIP code: BRAIN-VIP-2026.
+  ```
+
+---
+
+### ب. الباقة الشهرية (داخل Subscriptions > Brainquests Pro Access):
+* **Product ID:** `minigenius_pro_monthly`
+* **Reference Name:** `Brainquests Pro Monthly`
+* **Duration:** `1 Month`
+* **السعر المقترح:** `$4.99`
+* **اسم العرض بالإنجليزي:** `Brainquests Pro Monthly`
+* **وصف العرض بالإنجليزي:** `Monthly auto-renewing access to all Pro levels and intelligence radar`
+* **اسم العرض بالعربي:** `اشتراك Brainquests Pro الشهري`
+* **وصف العرض بالعربي:** `وصول كامل لكافة المراحل الاحترافية ومزايا التطبيق باشتراك شهري مرن`
+* **Review Notes:**
+  ```text
+  Monthly auto-renewable subscription granting full access to Pro levels 11-20, intelligence radar, and multi-child profile management. Testable via VIP code: BRAIN-VIP-2026.
+  ```
+
+---
+
+### ج. باقة مدى الحياة (داخل In-App Purchases > Non-Consumable):
+* **Product ID:** `minigenius_lifetime`
+* **Reference Name:** `Brainquests Pro Lifetime`
+* **السعر المقترح:** `$79.99`
+* **اسم العرض بالإنجليزي:** `Brainquests Pro Lifetime Pass`
+* **وصف العرض بالإنجليزي:** `One-time purchase for permanent unlimited access to all Pro features`
+* **اسم العرض بالعربي:** `عضوية Brainquests Pro مدى الحياة`
+* **وصف العرض بالعربي:** `دفعة واحدة لفتح كافة ميزات التطبيق مدى الحياة بدون اشتراكات دورية`
+* **Review Notes:**
+  ```text
+  Unlocks levels 11 through 20 across all 10 educational games and permanent access to all Pro features. Can be tested without purchasing using VIP test code: BRAIN-VIP-2026 in Settings.
+  ```
 
 ### 📌 Review Notes (ملاحظات خاصة بمراجع آبل)
 ضع هذا النص في خانة **Notes** في قسم **App Review Information**:

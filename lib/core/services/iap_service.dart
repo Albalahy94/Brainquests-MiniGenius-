@@ -17,14 +17,20 @@ class IAPService {
   List<ProductDetails> _products = [];
 
   // Subscription Product IDs (Auto-Renewable)
-  static const String monthlySubId = 'minigenius_monthly';
-  static const String yearlySubId = 'minigenius_yearly';
+  static const String monthlySubId = 'minigenius_pro_monthly';
+  static const String yearlySubId = 'minigenius_pro_yearly';
   static const String lifetimeId = 'minigenius_lifetime';
   static const String legacyProductId = 'premium_upgrade';
+
+  // Legacy/Fallback IDs
+  static const String legacyMonthlySubId = 'minigenius_monthly';
+  static const String legacyYearlySubId = 'minigenius_yearly';
 
   static const Set<String> allProductIds = {
     monthlySubId,
     yearlySubId,
+    legacyMonthlySubId,
+    legacyYearlySubId,
     lifetimeId,
     legacyProductId,
   };
@@ -83,8 +89,8 @@ class IAPService {
     }
   }
 
-  ProductDetails? getMonthlyProduct() => getProduct(monthlySubId);
-  ProductDetails? getYearlyProduct() => getProduct(yearlySubId);
+  ProductDetails? getMonthlyProduct() => getProduct(monthlySubId) ?? getProduct(legacyMonthlySubId);
+  ProductDetails? getYearlyProduct() => getProduct(yearlySubId) ?? getProduct(legacyYearlySubId);
   ProductDetails? getLifetimeProduct() => getProduct(lifetimeId);
 
   Future<bool> purchaseProduct(String productId) async {
