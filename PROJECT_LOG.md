@@ -55,9 +55,16 @@
 1. **صياغة حزمة البيانات المعتمدة لمتجر آبل (App Store Connect) للإصدار 2.0:**
    - صياغة النص الترويجي **Promotional Text** بدقة (159 حرفاً من أصل 170).
    - صياغة ما الجديد في هذا الإصدار **What's New in This Version** مع إبراز باقة VIP Pro، والبازل المتجهي، ومشاهد الفروقات، ورادار الذكاء.
+   - تنقيح الوصف الكامل وما الجديد باللغتين الإنجليزية والعربية **وحذف 100% من الإيموجي والرموز** لمطابقة معايير آبل الصارمة (Apple Guideline 2.3.8) لتفادي الرفض الفوري.
    - تحديث وتوسيع الوصف الكامل **Description** ليتضمن متطلبات وشروط الاشتراكات التجديدية الصارمة لبند Guideline 3.1.2، وخلو التطبيق من الإعلانات تماماً لمطابقة COPPA وتصنيف Kids Category.
    - مراجعة الكلمات المفتاحية **Keywords** (95 حرفاً من أصل 100).
    - كتابة ملاحظات مراجعة آبل **App Review Notes** تتضمن كود الفحص المجاني (`BRAIN-VIP-2026`) وشرح بوابات الوالدين (Parental Gate) وبيانات الاتصال.
+2. **معالجة تعارض Product IDs في آبل للاشتراكات التجديدية:**
+   - اشترطت آبل نقل الاشتراكات الدورية من In-App Purchases إلى قسم Subscriptions.
+   - وبسبب حجز آبل للمعرفات القديمة، تم تحديث كود التطبيق في `lib/core/services/iap_service.dart` لدعم المعرفات الجديدة:
+     - `minigenius_pro_yearly` (الاشتراك السنوي).
+     - `minigenius_pro_monthly` (الاشتراك الشهري).
+     - الحفاظ على `minigenius_lifetime` والـ Legacy IDs لضمان التوافق العكسي مع جوجل بلاي.
    - حفظ التوثيق الشامل في [`docs/Fixes_and_Guides/APP_STORE_VERSION_2_METADATA.md`](file:///d:/projects/Brainquests/docs/Fixes_and_Guides/APP_STORE_VERSION_2_METADATA.md).
 
 ---
