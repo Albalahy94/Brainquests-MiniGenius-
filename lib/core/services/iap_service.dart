@@ -12,9 +12,14 @@ class IAPService {
 
   final InAppPurchase _iap = InAppPurchase.instance;
   final StorageService _storageService = StorageService();
+  final StreamController<PurchaseStatus> _purchaseStatusController =
+      StreamController<PurchaseStatus>.broadcast();
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   bool _isAvailable = false;
   List<ProductDetails> _products = [];
+
+  Stream<PurchaseStatus> get purchaseStatusStream =>
+      _purchaseStatusController.stream;
 
   // Subscription Product IDs (Auto-Renewable)
   static const String monthlySubId = 'minigenius_pro_monthly';
@@ -93,34 +98,52 @@ class IAPService {
   ProductDetails? getYearlyProduct() => getProduct(yearlySubId) ?? getProduct(legacyYearlySubId);
   ProductDetails? getLifetimeProduct() => getProduct(lifetimeId);
 
-  Future<bool> purchaseProduct(String productId) async {
-    if (!_isAvailable || _products.isEmpty) {
-      debugPrint('ℹ️ Store products unavailable for purchase: $productId');
-      return false;
-    }
-
+  Future<bool> purchaseProductDetails(ProductDetails product) async {
     try {
-      final product = _products.firstWhere(
-        (p) => p.id == productId,
-        orElse: () => _products.first,
-      );
-
       final purchaseParam = PurchaseParam(productDetails: product);
-      if (productId == monthlySubId || productId == yearlySubId) {
-        // Auto-renewable subscriptions
-        return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
-      } else {
-        return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
-      }
+      return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
     } catch (e) {
       debugPrint('❌ Purchase failed with error: $e');
       return false;
     }
   }
 
-  Future<bool> purchaseMonthly() => purchaseProduct(monthlySubId);
-  Future<bool> purchaseYearly() => purchaseProduct(yearlySubId);
-  Future<bool> purchaseLifetime() => purchaseProduct(lifetimeId);
+  Future<bool> purchaseMonthly() async {
+    final product = getMonthlyProduct();
+    if (product == null) {
+      debugPrint('ℹ️ Monthly product not available in store products');
+      return false;
+    }
+    return purchaseProductDetails(product);
+  }
+
+  Future<bool> purchaseYearly() async {
+    final product = getYearlyProduct();
+    if (product == null) {
+      debugPrint('ℹ️ Yearly product not available in store products');
+      return false;
+    }
+    return purchaseProductDetails(product);
+  }
+
+  Future<bool> purchaseLifetime() async {
+    final product = getLifetimeProduct();
+    if (product == null) {
+      debugPrint('ℹ️ Lifetime product not available in store products');
+      return false;
+    }
+    return purchaseProductDetails(product);
+  }
+
+  Future<bool> purchaseProduct(String productId) async {
+    final product = getProduct(productId);
+    if (product == null) {
+      debugPrint('ℹ️ Product $productId not available in store products');
+      return false;
+    }
+    return purchaseProductDetails(product);
+  }
+
   Future<bool> purchasePremium() => purchaseYearly(); // Default
 
   Future<void> restorePurchases() async {
@@ -137,6 +160,7 @@ class IAPService {
 
   void _onPurchaseUpdate(List<PurchaseDetails> purchases) {
     for (var purchase in purchases) {
+      _purchaseStatusController.add(purchase.status);
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
         _handlePurchaseSuccess(purchase);

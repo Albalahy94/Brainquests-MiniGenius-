@@ -8,11 +8,9 @@
 
 * **اسم التطبيق:** Brainquests (Mini Genius - عباقرة صغار)
 * **معرف الحزمة (Package ID):** `octukheir.minigenius.app`
-* **الإصدار الحالي (Current Version):** `2.0.3+6`
+* **الإصدار الحالي (Current Version):** `2.0.4+23`
 * **الفرع النشط (Git Branch):** `master` (مُزامن مع المستودع السحابي `origin/master`)
-* **ملف الإنتاج الحالي لمتجر جوجل بلاي:**
-  `build\app\outputs\bundle\release\app-release.aab` (بحجم ~58.3 ميجابايت، متوافق مع Play Billing Library 8.0.0 ومبني بنجاح بتاريخ 2026-11-06).
-* **مكتبة المشتريات والاشتراكات المعتمدة:** `Google Play Billing Library 8.0.0` (إلزامية جوجل بلاي لحل الخطأ المانع للإصدار 5).
+* **مكتبة المشتريات والاشتراكات المعتمدة:** `Google Play Billing Library 8.0.0` (تم تثبيتها وإجبارها في `build.gradle.kts` و `in_app_purchase_android: 0.5.0` لحل متطلب جوجل بلاي).
 * **حالة الاختبارات والتحليل (Dart Analyze):** خالي تماماً من الأخطاء (0 Compilation / Type Errors).
 
 ---
@@ -46,6 +44,21 @@
 ---
 
 ## 📅 سجل التحديثات اليومية المفصل (Daily Execution Log)
+
+---
+
+### [2026-11-08] - معالجة رفض مراجعة آبل (Guideline 2.1b) وترقية الإصدار إلى 2.0.4+23 وتوضيح خطأ جوجل بلاي 8.0.0
+
+#### 🎯 الأهداف المنفذة:
+1. **معالجة رفض مراجعة آبل للإصدار 2.0 (Build 22):**
+   - قامت آبل برفض البناء 22 بموجب Guideline 2.1(b) لظهور رسالة خطأ عند الضغط على زر الشراء لعدم مطابقة المعرفات القديمة مع المعرفات الجديدة المضافة في Subscriptions، بالإضافة لظهور رسالة "الاشتراك المباشر" المحظورة تماماً على iOS (Guideline 3.1.1).
+   - تم تعديل [`lib/core/services/iap_service.dart`](file:///d:/projects/Brainquests/lib/core/services/iap_service.dart) لإضافة ستريم `purchaseStatusStream` لبث حالات الشراء، والشراء المباشر عبر كائنات `ProductDetails` الفعلية المحملة من المتجر.
+   - تم تعديل [`lib/features/premium/ui/premium_screen.dart`](file:///d:/projects/Brainquests/lib/features/premium/ui/premium_screen.dart) للاستماع للستريم وعدم إغلاق الشاشة قبل اكتمال الدفع، وحذف أي إشارة للاشتراك المباشر على منصة iOS نهائياً.
+2. **رفع رقم الإصدار إلى 2.0.4+23:**
+   - تم رفع الإصدار في `pubspec.yaml` إلى `2.0.4+23` لتجهيز Build 23 لـ TestFlight و App Store، ورمز الإصدار 23 لأندرويد.
+3. **توضيح وتفصيل خطأ Google Play Console (Billing Library 8.0.0):**
+   - تم فحص الخطأ المعروض في كونسول جوجل بلاي، وتبيّن أن الخطأ صادر لحزمة الإصدار القديم (رمز الإصدار 5 / Version Code 5) التي كانت مبنية بـ Billing 7.1.1.
+   - كود وتكوين المشروع في أندرويد (`android/app/build.gradle.kts`) مُعد ومثبت بالفعل على `com.android.billingclient:billing:8.0.0` وحزمة `in_app_purchase_android: 0.5.0`، وتجاوز الخطأ يتم بمجرد رفع حزمة الإصدار الجديد واستبعاد الحزمة القديمة 5 من مسودة الإصدار.
 
 ---
 

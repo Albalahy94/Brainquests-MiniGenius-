@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/iap_service.dart';
@@ -21,6 +23,7 @@ class PremiumScreen extends StatefulWidget {
 
 class _PremiumScreenState extends State<PremiumScreen> {
   final IAPService _iapService = IAPService();
+  StreamSubscription<PurchaseStatus>? _purchaseSub;
   bool _isLoading = false;
   int _selectedPlanIndex = 0; // 0 = Yearly (Best Value), 1 = Monthly, 2 = Lifetime
 
@@ -28,6 +31,41 @@ class _PremiumScreenState extends State<PremiumScreen> {
   void initState() {
     super.initState();
     _iapService.loadProducts();
+    _purchaseSub = _iapService.purchaseStatusStream.listen((status) {
+      if (!mounted) return;
+      if (status == PurchaseStatus.purchased || status == PurchaseStatus.restored) {
+        setState(() => _isLoading = false);
+        final isAr = Localizations.localeOf(context).languageCode == 'ar';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isAr
+                ? 'تم تفعيل اشتراك Brainquests Pro بنجاح! 🎉'
+                : 'Brainquests Pro activated successfully! 🎉'),
+            backgroundColor: AppTheme.mintGreen,
+          ),
+        );
+        Navigator.pop(context, true);
+      } else if (status == PurchaseStatus.error || status == PurchaseStatus.canceled) {
+        setState(() => _isLoading = false);
+        if (status == PurchaseStatus.error) {
+          final isAr = Localizations.localeOf(context).languageCode == 'ar';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isAr
+                  ? 'تعذر إتمام عملية الشراء في الوقت الحالي. يرجى المحاولة لاحقاً.'
+                  : 'Unable to complete purchase at this time. Please try again later.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _purchaseSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _handlePurchase() async {
@@ -36,25 +74,30 @@ class _PremiumScreenState extends State<PremiumScreen> {
     // If store products are empty or IAP is not available
     if (!_iapService.isAvailable || _iapService.products.isEmpty) {
       if (!kIsWeb && Platform.isIOS) {
+        // Try reloading once
+        await _iapService.loadProducts();
+        if (_iapService.products.isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(isAr
+                    ? 'تعذر الاتصال بمتجر App Store. يرجى التأكد من اتصال الإنترنت والمحاولة مرة أخرى.'
+                    : 'Unable to connect to the App Store. Please check your internet connection and try again.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
+      } else {
+        final planId = _selectedPlanIndex == 0
+            ? 'yearly'
+            : (_selectedPlanIndex == 1 ? 'monthly' : 'lifetime');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(isAr
-                  ? 'جاري تحميل باقات الاشتراك من متجر App Store، يرجى المحاولة بعد قليل.'
-                  : 'Loading subscription plans from the App Store. Please try again shortly.'),
-              backgroundColor: Colors.amber.shade800,
-            ),
-          );
+          await DirectSubscriptionDialog.show(context, initialPlanId: planId);
         }
         return;
       }
-      final planId = _selectedPlanIndex == 0
-          ? 'yearly'
-          : (_selectedPlanIndex == 1 ? 'monthly' : 'lifetime');
-      if (mounted) {
-        await DirectSubscriptionDialog.show(context, initialPlanId: planId);
-      }
-      return;
     }
 
     setState(() {
@@ -62,53 +105,42 @@ class _PremiumScreenState extends State<PremiumScreen> {
     });
 
     try {
-      bool success = false;
+      bool initiated = false;
       if (_selectedPlanIndex == 0) {
-        success = await _iapService.purchaseYearly();
+        initiated = await _iapService.purchaseYearly();
       } else if (_selectedPlanIndex == 1) {
-        success = await _iapService.purchaseMonthly();
+        initiated = await _iapService.purchaseMonthly();
       } else {
-        success = await _iapService.purchaseLifetime();
+        initiated = await _iapService.purchaseLifetime();
       }
 
-      if (success) {
+      if (!initiated) {
         if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(isAr
-                  ? 'تم تفعيل اشتراك Brainquests Pro بنجاح! 🎉'
-                  : 'Brainquests Pro activated successfully! 🎉'),
-              backgroundColor: AppTheme.mintGreen,
-            ),
-          );
-          Navigator.pop(context, true);
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(isAr
-                  ? 'تعذر إتمام عملية الشراء عبر المتجر. يمكنك استخدام طلب الاشتراك المباشر.'
-                  : 'Purchase could not be completed via store. You can use direct subscription.'),
+                  ? 'تعذر بدء عملية الشراء عبر المتجر. يرجى المحاولة مرة أخرى.'
+                  : 'Unable to initiate store purchase. Please try again.'),
               backgroundColor: Colors.red,
             ),
           );
         }
       }
+      // If initiated successfully, StoreKit dialog is open; status stream listener handles completion
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(isAr ? 'حدث خطأ: $e' : 'Error: $e'),
             backgroundColor: Colors.red,
           ),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
@@ -152,13 +184,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ? 'لم يتم العثور على اشتراك نشط سابق لهذا الحساب أو الجهاز.'
                   : 'No active subscriptions found for this account or device.'),
               backgroundColor: Colors.orange.shade800,
-              action: SnackBarAction(
-                label: isAr ? 'طلب اشتراك' : 'Subscribe',
-                textColor: Colors.white,
-                onPressed: () {
-                  DirectSubscriptionDialog.show(context);
-                },
-              ),
             ),
           );
         }
