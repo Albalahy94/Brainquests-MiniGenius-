@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/screen_time_service.dart';
+import '../services/licensing_api_service.dart';
+import '../providers/app_state_provider.dart';
 import '../../features/parent_dashboard/ui/screen_time_locked_screen.dart';
 
 class ScreenTimeWatcher extends StatefulWidget {
@@ -48,6 +51,15 @@ class _ScreenTimeWatcherState extends State<ScreenTimeWatcher>
     if (state == AppLifecycleState.resumed) {
       _isResumed = true;
       _startTimer();
+      // Seamlessly re-verify central license status on app resume
+      try {
+        final appState = Provider.of<AppStateProvider>(context, listen: false);
+        LicensingApiService().verifyLicense().then((res) {
+          if (res['data'] != null && mounted) {
+            appState.refreshUserProgress();
+          }
+        }).catchError((_) {});
+      } catch (_) {}
     } else {
       _isResumed = false;
       _stopTimer();
