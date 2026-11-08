@@ -8,7 +8,7 @@
 
 * **اسم التطبيق:** Brainquests (Mini Genius - عباقرة صغار)
 * **معرف الحزمة (Package ID):** `octukheir.minigenius.app`
-* **الإصدار الحالي (Current Version):** `2.0.4+23`
+* **الإصدار الحالي (Current Version):** `2.0.4+24`
 * **الفرع النشط (Git Branch):** `master` (مُزامن مع المستودع السحابي `origin/master`)
 * **مكتبة المشتريات والاشتراكات المعتمدة:** `Google Play Billing Library 8.0.0` (تم تثبيتها وإجبارها في `build.gradle.kts` و `in_app_purchase_android: 0.5.0` لحل متطلب جوجل بلاي).
 * **حالة الاختبارات والتحليل (Dart Analyze):** خالي تماماً من الأخطاء (0 Compilation / Type Errors).
