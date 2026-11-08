@@ -361,6 +361,8 @@ class LicensingApiService {
             ? parentEmail.trim().toLowerCase()
             : '$parentPhone@brainquests.client',
         'app_slug': 'brainquests',
+        'device_id': deviceId,
+        'plan': planId,
         'subject': 'طلب تفعيل اشتراك VIP - باقة $planName ($price)',
         'message': 'طلب اشتراك جديد من تطبيق Brainquests للأطفال.\n'
             '• اسم ولي الأمر: $parentName\n'
