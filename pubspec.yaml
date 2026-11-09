@@ -29,6 +29,7 @@ dependencies:
   firebase_core: ^2.24.2
   firebase_analytics: ^10.7.4
   firebase_crashlytics: ^3.4.9
+  firebase_messaging: ^14.7.10
   
   # In-App Purchase
   in_app_purchase: ^3.3.0

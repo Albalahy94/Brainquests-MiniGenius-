@@ -43,6 +43,7 @@ class LicensingApiService {
     try {
       final deviceId = await getDeviceId();
       final uri = Uri.parse('$baseUrl/verify.php');
+      final fcmToken = NotificationService().fcmToken;
 
       final client = HttpClient()
         ..connectionTimeout = const Duration(seconds: 8);
@@ -54,6 +55,7 @@ class LicensingApiService {
       final body = jsonEncode({
         'app_key': kAppKey,
         'device_id': deviceId,
+        if (fcmToken != null && fcmToken.isNotEmpty) 'fcm_token': fcmToken,
       });
       request.write(body);
 

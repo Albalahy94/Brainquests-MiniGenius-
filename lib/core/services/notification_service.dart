@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'parent_dashboard_service.dart';
 
@@ -10,16 +11,52 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
+  String? _fcmToken;
   final ParentDashboardService _parentService = ParentDashboardService();
 
-  /// Initialize notification service
+  String? get fcmToken => _fcmToken;
+
+  /// Initialize notification service & Firebase Cloud Messaging (FCM)
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
-      // Request permission (Android 13+)
+      // Request local permission (Android 13+)
       if (await Permission.notification.isDenied) {
         await Permission.notification.request();
+      }
+
+      // Initialize Firebase Messaging permissions & token
+      try {
+        final fcm = FirebaseMessaging.instance;
+        await fcm.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+
+        _fcmToken = await fcm.getToken();
+        debugPrint('📲 FCM Token initialized: $_fcmToken');
+
+        // Listen for foreground messages and show local notification
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          debugPrint('📩 Foreground FCM Message received: ${message.notification?.title}');
+          if (message.notification != null) {
+            showSystemNotification(
+              title: message.notification!.title ?? 'إشعار جديد',
+              body: message.notification!.body ?? '',
+              payload: message.data['type'] ?? '',
+            );
+          }
+        });
+
+        // Listen for token refreshes
+        fcm.onTokenRefresh.listen((newToken) {
+          _fcmToken = newToken;
+          debugPrint('🔄 FCM Token refreshed: $_fcmToken');
+        });
+      } catch (fcmError) {
+        debugPrint('⚠️ FCM initialization note: $fcmError');
       }
 
       const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
