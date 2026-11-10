@@ -160,6 +160,43 @@ class LicensingApiService {
 
   /// Redeem an official license / promo key issued by Albalahy Licensing Hub
   Future<Map<String, dynamic>> redeemCode(String code, {String? email}) async {
+    final cleanCode = code.trim().toUpperCase();
+
+    // Built-in offline fallback for Apple Reviewers (BRAIN-VIP-2026)
+    if (cleanCode == 'BRAIN-VIP-2026' || cleanCode == 'BRAIN-PRO-2026') {
+      await _storageService.updateUserProgress((p) {
+        p.isPremium = true;
+        p.isTestMode = true;
+        return p;
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_licensePlanKey, 'pro');
+      await prefs.setString(_licenseExpiresKey, '2028-12-31 23:59:59');
+
+      NotificationService().showSystemNotification(
+        title: '🎉 تم تفعيل اشتراك المحترفين!',
+        body: 'تهانينا! تم تفعيل باقة Brainquests Pro بنجاح لكافة الألعاب والمراحل.',
+      );
+
+      // Also sync silently with server in background
+      _syncRedeemWithServer(cleanCode, email);
+
+      return {
+        'status': 'success',
+        'message': 'تم تفعيل باقة Brainquests Pro بنجاح! جميع المراحل مفتوحة الآن.',
+        'data': {
+          'plan': 'pro',
+          'is_pro': true,
+          'expires_at': '2028-12-31 23:59:59',
+        }
+      };
+    }
+
+    return _syncRedeemWithServer(cleanCode, email);
+  }
+
+  Future<Map<String, dynamic>> _syncRedeemWithServer(String code, String? email) async {
     try {
       final deviceId = await getDeviceId();
       final uri = Uri.parse('$baseUrl/redeem.php');
